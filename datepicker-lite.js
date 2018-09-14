@@ -5,7 +5,6 @@ import '@polymer/paper-input/paper-input.js';
 import '@polymer/iron-icons/iron-icons.js';
 
 import './calendar-lite.js';
-import moment from "moment";
 
 /**
  * @customElement
@@ -172,10 +171,8 @@ class DatePickerLite extends PolymerElement {
   }
 
   computeDate(month, day, year) {
-    this.validate();
-    let newDate = new Date(year, month - 1, day);
-
-    if (moment(newDate, 'YYYY-MM-DD', true).isValid()) {
+    if ( !this.validate() && this.validate() !== undefined) {
+      let newDate = new Date(year, month - 1, day);
       this.set('inputDate', newDate);
     }
   }
@@ -197,6 +194,7 @@ class DatePickerLite extends PolymerElement {
     this.set('dayInput', undefined);
     this.set('yearInput', undefined);
     this.set('value', null);
+    this.set('invalid', false);
   }
 
   validate() {
@@ -217,7 +215,17 @@ class DatePickerLite extends PolymerElement {
       return;
     }
 
-    if (typeof this.monthInput === 'undefined' || typeof this.dayInput === 'undefined' || typeof this.yearInput === 'undefined' || this.yearInput.length < 4) {
+    if (typeof this.monthInput === 'undefined') {
+      this.set('invalid', true);
+      return;
+    }
+
+    if (typeof this.dayInput === 'undefined'){
+      this.set('invalid', true);
+      return;
+    }
+
+    if (typeof this.yearInput === 'undefined' || this.yearInput.length < 4) {
       this.set('invalid', true);
       return;
     }
