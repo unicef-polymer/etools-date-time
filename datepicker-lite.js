@@ -171,7 +171,7 @@ class DatePickerLite extends PolymerElement {
   }
 
   computeDate(month, day, year) {
-    if ( !this.validate() && this.validate() !== undefined) {
+    if ( this.validate() ) {
       let newDate = new Date(year, month - 1, day);
       this.set('inputDate', newDate);
     }
@@ -241,7 +241,7 @@ class DatePickerLite extends PolymerElement {
       return;
     }
 
-    return this.invalid;
+    return !this.invalid;
   }
 
 }
