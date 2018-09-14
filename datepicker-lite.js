@@ -172,39 +172,8 @@ class DatePickerLite extends PolymerElement {
   }
 
   computeDate(month, day, year) {
-    this.set('invalid', false);
-
-    if (year < 1 || year > 9999 ) {
-      this.set('invalid', true);
-      return;
-    }
-
-    if (month < 1 || month > 12 ) {
-      this.set('invalid', true);
-      return;
-    }
-
-    if (day < 1 || day > 31) {
-      this.set('invalid', true);
-      return;
-    }
-
-    if (typeof month === 'undefined' || typeof day === 'undefined' || typeof year === 'undefined' || year.length < 4) {
-      return;
-    }
-
+    this.validate();
     let newDate = new Date(year, month - 1, day);
-
-    let newYear = newDate.getFullYear();
-    let newMonth = newDate.getMonth() + 1;
-    let newDay = newDate.getDate();
-
-    if (newMonth !== Number(month) || newDay !== Number(day) || newYear !== Number(year)) {
-      this.set('invalid', true);
-      return;
-    }
-
-    this.set('invalid', !moment(newDate, 'YYYY-MM-DD', true).isValid());
 
     if (moment(newDate, 'YYYY-MM-DD', true).isValid()) {
       this.set('inputDate', newDate);
@@ -228,6 +197,43 @@ class DatePickerLite extends PolymerElement {
     this.set('dayInput', undefined);
     this.set('yearInput', undefined);
     this.set('value', null);
+  }
+
+  validate() {
+    this.set('invalid', false);
+
+    if (this.yearInput < 1 || this.yearInput > 9999 ) {
+      this.set('invalid', true);
+      return;
+    }
+
+    if (this.monthInput < 1 || this.monthInput > 12 ) {
+      this.set('invalid', true);
+      return;
+    }
+
+    if (this.dayInput < 1 || this.dayInput > 31) {
+      this.set('invalid', true);
+      return;
+    }
+
+    if (typeof this.monthInput === 'undefined' || typeof this.dayInput === 'undefined' || typeof this.yearInput === 'undefined' || this.yearInput.length < 4) {
+      this.set('invalid', true);
+      return;
+    }
+
+    let newDate = new Date(this.yearInput, this.monthInput - 1, this.dayInput);
+
+    let newYear = newDate.getFullYear();
+    let newMonth = newDate.getMonth() + 1;
+    let newDay = newDate.getDate();
+
+    if (newMonth !== Number(this.monthInput) || newDay !== Number(this.dayInput) || newYear !== Number(this.yearInput)) {
+      this.set('invalid', true);
+      return;
+    }
+
+    return this.invalid;
   }
 
 }
