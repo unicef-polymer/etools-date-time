@@ -102,7 +102,8 @@ class DatePickerLite extends PolymerElement {
     return {
       value: {
         type: String,
-        notify: true
+        notify: true,
+        observer: '_valueChanged'
       },
       readonly: {
         type: Boolean,
@@ -242,6 +243,24 @@ class DatePickerLite extends PolymerElement {
     }
 
     return !this.invalid;
+  }
+
+  _valueChanged(newValue) {
+    console.log(newValue);
+    if (!newValue) {
+      return;
+    }
+
+    let newDate = new Date(newValue);
+
+    let newYear = newDate.getFullYear();
+    let newMonth = newDate.getMonth() + 1;
+    let newDay = newDate.getDate();
+
+    if (newMonth !== Number(this.monthInput) || newDay !== Number(this.dayInput) || newYear !== Number(this.yearInput)) {
+      this.set('inputDate', newDate);
+    }
+
   }
 
 }
