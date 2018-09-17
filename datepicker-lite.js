@@ -246,7 +246,6 @@ class DatePickerLite extends PolymerElement {
   }
 
   _valueChanged(newValue) {
-    console.log(newValue);
     if (!newValue) {
       return;
     }
