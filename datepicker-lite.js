@@ -77,14 +77,17 @@ class DatePickerLite extends PolymerElement {
       </style>
 
       <paper-input-container always-float-label
-                             required$="[[required]]" invalid="{{invalid}}" error-message="Invalid date.">
+                             disabled$="[[disabled]]"
+                             required$="[[required]]" 
+                             invalid="{{invalid}}" 
+                             error-message="Invalid date.">
         <label hidden$=[[!label]] slot="label">[[label]]</label>
         <iron-icon slot="prefix" on-keypress="keyCalendar" icon="date-range" alt="toggle" title="toggle" tabindex="1"
                    on-tap="toggleCalendar"></iron-icon>
         <div slot="input" class="paper-input-input">
-          <input value="{{monthInput::input}}" class="monthInput" placeholder="mm" type="number" min="1" max="12">/
-          <input value="{{dayInput::input}}" class="dayInput" placeholder="dd" type="number" min="1" max="31">/
-          <input value="{{yearInput::input}}" class="yearInput" placeholder="yyyy" type="number" maxlength="4" min="1" max="9999">
+          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm" type="number" min="1" max="12">/
+          <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number" min="1" max="31">/
+          <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy" type="number" min="1" max="9999">
         </div>
       </paper-input-container>
 
@@ -107,7 +110,18 @@ class DatePickerLite extends PolymerElement {
       },
       readonly: {
         type: Boolean,
-        value: false
+        value: false,
+        reflectToAttribute: true,
+      },
+      required: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true,
+      },
+      disabled: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true,
       },
       label: String,
       monthInput: {
@@ -172,19 +186,26 @@ class DatePickerLite extends PolymerElement {
   }
 
   computeDate(month, day, year) {
-    if ( this.validate() ) {
+    this.set('value', year + '-' + month + '-' + day);
+    if (this._isValidYear() && this._isValidMonth() &&
+        this._isValidDay() && this._enteredDateIsValid() ) {
       let newDate = new Date(year, month - 1, day);
       this.set('inputDate', newDate);
     }
   }
 
   toggleCalendar() {
-    this.set('opened', !this.opened);
+    if (!this.readonly) {
+      this.set('opened', !this.opened);
+    }
+
   }
 
   keyCalendar(event){
-    if (event.which === 13 || event.button === 0){
-      this.set('opened', !this.opened);
+    if (!this.readonly) {
+      if (event.which === 13 || event.button === 0){
+        this.set('opened', !this.opened);
+      }
     }
   }
 
@@ -198,69 +219,111 @@ class DatePickerLite extends PolymerElement {
     this.set('invalid', false);
   }
 
-  validate() {
-    this.set('invalid', false);
+  _isValidYear() {
+    return this.yearInput >= 1970 && this.yearInput < 9999 && this.yearInput.length === 4;
+  }
 
-    if (this.yearInput < 1 || this.yearInput > 9999 ) {
-      this.set('invalid', true);
-      return;
-    }
+  _isValidMonth() {
+    // this.monthInput = this.monthInput.length < 2 ? '0' + this.monthInput : this.monthInput;
+    // console.log(this.monthInput);
+    // console.log(this.monthInput >= 1);
+    return this.monthInput >= 1 && this.monthInput <= 12;
+  }
 
-    if (this.monthInput < 1 || this.monthInput > 12 ) {
-      this.set('invalid', true);
-      return;
-    }
+  _isValidDay() {
+    // this.dayInput = this.dayInput.length < 2 ? '0' + this.dayInput : this.dayInput;
+    return this.dayInput >= 1 && this.dayInput <= 31;
+  }
 
-    if (this.dayInput < 1 || this.dayInput > 31) {
-      this.set('invalid', true);
-      return;
-    }
 
-    if (typeof this.monthInput === 'undefined') {
-      this.set('invalid', true);
-      return;
-    }
-
-    if (typeof this.dayInput === 'undefined'){
-      this.set('invalid', true);
-      return;
-    }
-
-    if (typeof this.yearInput === 'undefined' || this.yearInput.length < 4) {
-      this.set('invalid', true);
-      return;
-    }
-
+  _enteredDateIsValid() {
     let newDate = new Date(this.yearInput, this.monthInput - 1, this.dayInput);
 
     let newYear = newDate.getFullYear();
     let newMonth = newDate.getMonth() + 1;
     let newDay = newDate.getDate();
 
-    if (newMonth !== Number(this.monthInput) || newDay !== Number(this.dayInput) || newYear !== Number(this.yearInput)) {
-      this.set('invalid', true);
-      return;
+    return newMonth === Number(this.monthInput) &&
+        newDay === Number(this.dayInput) &&
+        newYear === Number(this.yearInput);
+  }
+
+
+  validate() {
+    let valid = true;
+    // if ((typeof this.monthInput === 'undefined' ||
+    //     typeof this.dayInput === 'undefined' ||
+    //     typeof this.yearInput === 'undefined') && this.required) {
+    //   console.log("case 1");
+    //   valid = false;
+    // } else if (!this._isValidYear() || !this._isValidMonth() || !this._isValidDay()) {
+    //   console.log("case 2");
+    //   valid = false;
+    // } else {
+    //   console.log("case 3");
+    //   valid = this._enteredDateIsValid();
+    // }
+
+    if ((typeof this.monthInput === 'undefined' &&
+        typeof this.dayInput === 'undefined' &&
+        typeof this.yearInput === 'undefined') && this.required) {
+      return this._enteredDateIsValid();
+    } else {
+
     }
 
-    return !this.invalid;
+    this.set('invalid', !this.invalid);
+    return valid;
   }
 
   _valueChanged(newValue) {
     if (!newValue) {
+      if (this.monthInput || this.dayInput || this.yearInput) {
+        this._clearData();
+      }
       return;
     }
-
-    let newDate = new Date(newValue);
-
-    let newYear = newDate.getFullYear();
-    let newMonth = newDate.getMonth() + 1;
-    let newDay = newDate.getDate();
-
-    if (newMonth !== Number(this.monthInput) || newDay !== Number(this.dayInput) || newYear !== Number(this.yearInput)) {
-      this.set('inputDate', newDate);
+    if (this._enteredDateIsValid()) {
+      this.set('inputDate', new Date(newValue));
     }
 
   }
+
+  // _dayChanged(day) {
+  //   if (typeof day !== 'undefined') {
+  //     const d = Number(day);
+  //     if (d <= 0) {
+  //       this.set('dayInput', 1);
+  //     }
+  //     if (d > 31) {
+  //       this.set('dayInput', 31);
+  //     }
+  //   }
+  // }
+  //
+  // _monthChanged(month) {
+  //   if (typeof month !== 'undefined') {
+  //     const d = Number(month);
+  //     if (d <= 0) {
+  //       this.set('monthInput', 1);
+  //     }
+  //     if (d > 12) {
+  //       this.set('monthInput', 12);
+  //     }
+  //   }
+  // }
+  //
+  // _yearChanged(year) {
+  //   if (year && String(year).length >= 4) {
+  //     const d = Number(year);
+  //     if (d <= 1970) {
+  //       this.set('yearInput', 1970);
+  //     }
+  //     if (d > 9999) {
+  //       this.set('yearInput', 9999);
+  //     }
+  //   }
+  // }
 
 }
 
