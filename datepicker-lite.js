@@ -145,7 +145,8 @@ class DatePickerLite extends PolymerElement {
         type: Boolean,
         value: false
       },
-      _clearDateInProgress: Boolean
+      _clearDateInProgress: Boolean,
+      _dateFieldsPopulatedByDatepicker: Boolean
     };
   }
 
@@ -180,12 +181,18 @@ class DatePickerLite extends PolymerElement {
     day = day.length < 2 ? '0' + day : day;
 
     this.value = this._getDateString(date);
+    this._dateFieldsPopulatedByDatepicker = true;
     this.set('monthInput', month);
     this.set('dayInput', day);
     this.set('yearInput', year);
+    this._dateFieldsPopulatedByDatepicker = false;
   }
 
   computeDate(month, day, year) {
+    if (this._dateFieldsPopulatedByDatepicker) {
+      // prevent setting wrong value when year/month/day are set by datepiker in datePicked
+      return;
+    }
     this.set('value', year + '-' + month + '-' + day);
     if (this._isValidYear() && this._isValidMonth() &&
         this._isValidDay() && this._enteredDateIsValid() ) {
@@ -286,9 +293,8 @@ class DatePickerLite extends PolymerElement {
       }
       return;
     }
-    if (this._enteredDateIsValid()) {
-      this.set('inputDate', new Date(newValue));
-    }
+
+    this.set('inputDate', new Date(newValue));
   }
 
 }
