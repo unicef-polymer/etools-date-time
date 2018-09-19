@@ -115,7 +115,7 @@ class DatePickerLite extends PolymerElement {
       },
       required: {
         type: Boolean,
-        value: true,
+        value: false,
         reflectToAttribute: true,
       },
       disabled: {
@@ -255,7 +255,21 @@ class DatePickerLite extends PolymerElement {
       valid = this._enteredDateIsValid();
       this.set('invalid', !this._enteredDateIsValid());
       return valid;
-    } else if ((this._isValidMonth() && this._isValidDay() && this._isValidYear()) && !this.required) {
+
+    } else if (!this.required) {
+      if (this.monthInput !== undefined || this.dayInput !== undefined || this.yearInput !== undefined) {
+        if (this._isValidMonth() && this._isValidDay() && this._isValidYear()) {
+          valid = this._enteredDateIsValid();
+          this.set('invalid', false);
+          return valid;
+
+        }else {
+          this.set('invalid', true);
+          valid = this._enteredDateIsValid();
+          return valid;
+        }
+      }
+
       valid = this._enteredDateIsValid();
       this.set('invalid', false);
       return valid;
