@@ -301,8 +301,6 @@ class DatePickerLite extends PolymerElement {
     this.set('yearInput', dData[0]);
     this._stopDateCompute = false;
 
-    console.log("aaaaaaaaaaaaaaaaaaaa", this.date);
-
     const d = new Date(newValue);
     if (d.toString() !== 'Invalid Date') {
       this.set('inputDate', d);
