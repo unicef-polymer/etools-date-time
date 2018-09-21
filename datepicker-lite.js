@@ -146,7 +146,7 @@ class DatePickerLite extends PolymerElement {
         value: false
       },
       _clearDateInProgress: Boolean,
-      _dateFieldsPopulatedByDatepicker: Boolean
+      _stopDateCompute: Boolean
     };
   }
 
@@ -180,24 +180,25 @@ class DatePickerLite extends PolymerElement {
     month = month.length < 2 ? '0' + month : month;
     day = day.length < 2 ? '0' + day : day;
 
-    this.value = this._getDateString(date);
-    this._dateFieldsPopulatedByDatepicker = true;
+    this._stopDateCompute = true;
     this.set('monthInput', month);
     this.set('dayInput', day);
     this.set('yearInput', year);
-    this._dateFieldsPopulatedByDatepicker = false;
+    this.value = this._getDateString(date);
+    this._stopDateCompute = false;
   }
 
   computeDate(month, day, year) {
-    if (this._dateFieldsPopulatedByDatepicker) {
+    if (this._stopDateCompute) {
       // prevent setting wrong value when year/month/day are set by datepiker in datePicked
       return;
     }
-    this.set('value', year + '-' + month + '-' + day);
+
     if (this._isValidYear() && this._isValidMonth() &&
         this._isValidDay() && this._enteredDateIsValid() ) {
       let newDate = new Date(year, month - 1, day);
       this.set('inputDate', newDate);
+      this.set('value', year + '-' + month + '-' + day);
     }
   }
 
@@ -293,8 +294,19 @@ class DatePickerLite extends PolymerElement {
       }
       return;
     }
+    this._stopDateCompute = true;
+    const dData = newValue.split('-');
+    this.set('monthInput', dData[1]);
+    this.set('dayInput', dData[2]);
+    this.set('yearInput', dData[0]);
+    this._stopDateCompute = false;
 
-    this.set('inputDate', new Date(newValue));
+    console.log("aaaaaaaaaaaaaaaaaaaa", this.date);
+
+    const d = new Date(newValue);
+    if (d.toString() !== 'Invalid Date') {
+      this.set('inputDate', d);
+    }
   }
 
 }
