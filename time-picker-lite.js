@@ -106,7 +106,16 @@ class TimePickerLite extends PolymerElement {
 
   }
 
+  _isValidHour() {
+    return this.hoursInput >= 1 && this.hoursInput <= 23 && String(this.hoursInput).length <= 2;
+  }
+
+  _isValidMinute() {
+    return this.minutesInput >= 1 && this.minutesInput <= 59 && String(this.minutesInput).length <= 2;
+  }
+
   computeTime(hours, minutes) {
+
     // if (this._dateFieldsPopulatedByDatepicker) {
     //   // prevent setting wrong value when year/month/day are set by datepiker in datePicked
     //   return;
@@ -115,16 +124,18 @@ class TimePickerLite extends PolymerElement {
     // console.log(this.hoursInput);
     // console.log(this.minutesInput);
 
-    if (hours !== undefined && hours >= 1) {
+    if (hours !== undefined && this._isValidHour() ) {
       console.log("hours", hours);
-      hours = hours.length < 2 ? '0' + hours : hours;
-      this.set('hoursInput', hours);
+      // hours = hours.length < 2 ? '0' + hours : hours;
+      this.set('hoursInput', this._formatInput(hours));
     }
 
-    if (minutes !== undefined && minutes >= 1) {
+    if (minutes !== undefined && this._isValidMinute()) {
       console.log("minutes ", minutes);
-      minutes = minutes.length < 2 ? '0' + minutes : minutes;
-      this.set('minutesInput', minutes);
+      // console.log("minutes.length ", minutes.length);
+
+      // minutes = minutes.length < 2 ? '0' + minutes : minutes;
+      this.set('minutesInput', this._formatInput(minutes));
     }
 
 
@@ -134,6 +145,11 @@ class TimePickerLite extends PolymerElement {
     //   let newDate = new Date(year, month - 1, day);
     //   this.set('inputDate', newDate);
     // }
+
+  }
+
+  _formatInput(input) {
+    input = input.length < 2 ? '0' + input : input;
   }
 
   _clearData() {
