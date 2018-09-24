@@ -3,7 +3,6 @@ import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-input/paper-input.js';
 
 
-
 /**
  * @customElement
  * @polymer
@@ -13,8 +12,6 @@ class TimePickerLite extends PolymerElement {
     // language=HTML
     return html`
       <style>
-
-
 
 
         .paper-input-input input {
@@ -44,11 +41,12 @@ class TimePickerLite extends PolymerElement {
         <label hidden$=[[!label]] slot="label">[[label]]</label>
         <div slot="input" class="paper-input-input">
           <input value="{{hoursInput::input}}" readonly$="[[readonly]]" placeholder="hh" type="number" min="1" max="23">:
-          <input value="{{minutesInput::input}}" readonly$="[[readonly]]" placeholder="mm" type="number" min="1" max="59">
+          <input value="{{minutesInput::input}}" readonly$="[[readonly]]" placeholder="mm" type="number" min="1"
+                 max="59">
         </div>
       </paper-input-container>
-        
-    
+
+
     `;
   }
 
@@ -84,7 +82,8 @@ class TimePickerLite extends PolymerElement {
       invalid: {
         type: Boolean,
         value: false
-      }
+      },
+      _stopTimeCompute: Boolean
     };
   }
 
@@ -103,9 +102,11 @@ class TimePickerLite extends PolymerElement {
       return;
     }
 
+    this._stopTimeCompute = true;
     const dData = newValue.split(':');
     this.set('hoursInput', dData[0]);
     this.set('minutesInput', dData[1]);
+    this._stopTimeCompute = false;
 
     this.set('value', dData[0] + ':' + dData[1]);
 
@@ -120,6 +121,11 @@ class TimePickerLite extends PolymerElement {
   }
 
   computeTime(hours, minutes) {
+    if (this._stopTimeCompute) {
+      // prevent a loop when setting value from backend
+      return;
+    }
+
     hours = this._formatHours(hours);
     minutes = this._formatMinutes(minutes);
 
@@ -161,13 +167,6 @@ class TimePickerLite extends PolymerElement {
     this.set('invalid', this._isValidHours() || this._isValidMinutes());
     return this._isValidHours() || this._isValidMinutes();
   }
-
-  _stopTimeCompute() {
-
-  }
-
-
-
 
 }
 
