@@ -94,7 +94,6 @@ class TimePickerLite extends PolymerElement {
   }
 
   _valueChanged(newValue) {
-    console.log(newValue);
     if (!newValue) {
       if (this.hoursInput || this.minutesInput) {
         this._clearData();
