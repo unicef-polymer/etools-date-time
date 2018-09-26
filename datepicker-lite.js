@@ -20,10 +20,6 @@ class DatePickerLite extends PolymerElement {
           display: block;
         }
 
-        paper-input-container {
-          max-width: 225px;
-        }
-
         paper-dropdown-menu {
           width: 100%;
         }
