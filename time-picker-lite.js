@@ -40,8 +40,8 @@ class TimePickerLite extends PolymerElement {
                              value="[[value]]">
         <label hidden$=[[!label]] slot="label">[[label]]</label>
         <div slot="input" class="paper-input-input">
-          <input value="{{hoursInput::input}}" readonly$="[[readonly]]" placeholder="hh" type="number" min="1" max="23">:
-          <input value="{{minutesInput::input}}" readonly$="[[readonly]]" placeholder="mm" type="number" min="1"
+          <input value="{{hoursInput::input}}" on-blur="_formatHours" readonly$="[[readonly]]" placeholder="hh" type="number" min="1" max="23">:
+          <input value="{{minutesInput::input}}" on-blur="_formatMinutes" readonly$="[[readonly]]" placeholder="mm" type="number" min="1"
                  max="59">
         </div>
       </paper-input-container>
@@ -83,13 +83,17 @@ class TimePickerLite extends PolymerElement {
         type: Boolean,
         value: false
       },
-      _stopTimeCompute: Boolean
+      _allInputsFilled: {
+        type: Boolean,
+        value: false
+      }
     };
   }
 
   static get observers() {
     return [
-      'computeTime(hoursInput, minutesInput)'
+      'computeTime(hoursInput, minutesInput)',
+        'inputFields(hoursInput, minutesInput)'
     ];
   }
 
@@ -101,13 +105,9 @@ class TimePickerLite extends PolymerElement {
       return;
     }
 
-    this._stopTimeCompute = true;
     const dData = newValue.split(':');
     this.set('hoursInput', dData[0]);
     this.set('minutesInput', dData[1]);
-    this._stopTimeCompute = false;
-
-    this.set('value', dData[0] + ':' + dData[1]);
 
   }
 
@@ -119,32 +119,30 @@ class TimePickerLite extends PolymerElement {
     return this.minutesInput >= 1 && this.minutesInput <= 59 && String(this.minutesInput).length <= 2;
   }
 
+  inputFields(hours, minutes) {
+    if (hours !== undefined && minutes !== undefined) {
+      this.set('_allInputsFilled', true);
+    }
+  }
+
   computeTime(hours, minutes) {
-    if (this._stopTimeCompute) {
-      // prevent a loop when setting value from backend
-      return;
+    if (this._allInputsFilled) {
+      this.set('hoursInput', hours);
+      this.set('minutesInput', minutes);
+      this.set('value', hours + ':' + minutes);
     }
-
-    hours = this._formatHours(hours);
-    minutes = this._formatMinutes(minutes);
-
-    this.set('hoursInput', hours);
-    this.set('minutesInput', minutes);
-    this.set('value', hours + ':' + minutes);
   }
 
-  _formatHours(hours) {
-    if (isNaN(hours) || hours < 1 || hours > 23) {
-      return null;
+  _formatHours() {
+    if (isNaN(Number(this.hoursInput)) || Number(this.hoursInput) < 1 || Number(this.hoursInput) > 23) {
+      this.set('hoursInput', undefined);
     }
-    return hours;
   }
 
-  _formatMinutes(minutes) {
-    if (isNaN(minutes) || minutes < 1 || minutes > 59) {
-      return null;
+  _formatMinutes() {
+    if (isNaN(Number(this.minutesInput)) || Number(this.minutesInput) < 1 || Number(this.minutesInput) > 59) {
+      this.set('minutesInput', undefined);
     }
-    return minutes;
   }
 
   _isValidHours() {
