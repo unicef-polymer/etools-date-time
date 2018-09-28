@@ -136,12 +136,16 @@ class TimePickerLite extends PolymerElement {
   _formatHours() {
     if (isNaN(Number(this.hoursInput)) || Number(this.hoursInput) < 1 || Number(this.hoursInput) > 23) {
       this.set('hoursInput', undefined);
+    }else {
+      this.hoursInput = this.hoursInput.length < 2 ? '0' + this.hoursInput : this.hoursInput;
     }
   }
 
   _formatMinutes() {
     if (isNaN(Number(this.minutesInput)) || Number(this.minutesInput) < 1 || Number(this.minutesInput) > 59) {
       this.set('minutesInput', undefined);
+    }else {
+      this.minutesInput = this.minutesInput.length < 2 ? '0' + this.minutesInput : this.minutesInput;
     }
   }
 
