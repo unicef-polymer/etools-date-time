@@ -37,7 +37,8 @@ class DatePickerLite extends PolymerElement {
         }
 
         .clear-btn {
-          background: var(--my-elem-primary);
+          /*background: var(--my-elem-primary);*/
+          background: #ff4747;
           color: #fff;
           padding: 6px;
           margin: 10px 0 10px 10px;
@@ -58,6 +59,10 @@ class DatePickerLite extends PolymerElement {
 
         .yearInput {
           width: 40px;
+        }
+        
+        #calendar {
+          margin-top: -10px;
         }
 
         /***************** this is used to remove arrows from inputs *****************************/
@@ -145,13 +150,22 @@ class DatePickerLite extends PolymerElement {
         value: false
       },
       _clearDateInProgress: Boolean,
-      _stopDateCompute: Boolean
+      _stopDateCompute: Boolean,
+      autoValidate: {
+        type: Boolean,
+        value: false,
+      },
+      _allInputsFilled: {
+        type: Boolean,
+        value: false
+      }
     };
   }
 
   static get observers() {
     return [
-      'computeDate(monthInput, dayInput, yearInput)'
+      'computeDate(monthInput, dayInput, yearInput)',
+      'inputFields(monthInput, dayInput, yearInput)'
     ];
   }
 
@@ -188,17 +202,26 @@ class DatePickerLite extends PolymerElement {
   }
 
   computeDate(month, day, year) {
-    if (this._stopDateCompute) {
-      // prevent setting wrong value when year/month/day are set by datepiker in datePicked
-      return;
+    if (this.autoValidate) {
+      // this.set('_stopDateCompute', false);
+      this.set('invalid', !this._isValidYear() || !this._isValidMonth() || !this._isValidDay());
     }
 
-    if (this._isValidYear() && this._isValidMonth() &&
-        this._isValidDay() && this._enteredDateIsValid() ) {
-      let newDate = new Date(year, month - 1, day);
-      this.set('inputDate', newDate);
-      this.set('value', year + '-' + month + '-' + day);
+    if (this._allInputsFilled) {
+      if (this._stopDateCompute) {
+        // prevent setting wrong value when year/month/day are set by datepiker in datePicked
+        return;
+      }
+
+      if (this._isValidYear() && this._isValidMonth() &&
+          this._isValidDay() && this._enteredDateIsValid() ) {
+        let newDate = new Date(year, month - 1, day);
+        this.set('inputDate', newDate);
+        this.set('value', year + '-' + month + '-' + day);
+      }
     }
+
+
   }
 
   toggleCalendar() {
@@ -254,7 +277,6 @@ class DatePickerLite extends PolymerElement {
         newYear === Number(this.yearInput);
   }
 
-
   validate() {
     let valid = true;
 
@@ -303,6 +325,12 @@ class DatePickerLite extends PolymerElement {
     const d = new Date(newValue);
     if (d.toString() !== 'Invalid Date') {
       this.set('inputDate', d);
+    }
+  }
+
+  inputFields(month, day, year) {
+    if (month !== undefined && day !== undefined && year !== undefined) {
+      this.set('_allInputsFilled', true);
     }
   }
 
