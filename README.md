@@ -1,7 +1,7 @@
-Polymer 3 version for https://github.com/Manohar-Gunturu/calendar-lite
+Polymer 3 version of datepicker based on https://github.com/Manohar-Gunturu/calendar-lite
 # \<calendar-lite\>
 
-Multi select date picker or calendar `npm install git+https://github.com/daniel-tabarcea/calendar-lite`
+Multi select date picker or calendar `npm install git+https://github.com/unicef-polymer/etools-date-time.git`
 
 Calendar-lite is a Webcomponent build with Polymer. It gives a nice interface to play with it.
 
@@ -13,8 +13,6 @@ Calendar-lite is a Webcomponent build with Polymer. It gives a nice interface to
 4. Disable an array of dates(example 1st and 3rd of this month)
 5. triggers an event on date change(So you can update the value of an input field)
 6. triggers an event on month change(So you can set different disable dates for different months)
-7. Customizable theme, if you import calendar-lite-dark.html it gives dark theme.
-
 
 <!---
 ```
@@ -45,8 +43,6 @@ Calendar-lite is a Webcomponent build with Polymer. It gives a nice interface to
 ```html
 <calendar-lite  id="someid" disabled-week-day='["Fri","Sun"]' multi-select='{"max":3,"consequent":true}'></calendar-lite>
 ```
-Note: To work with dark theme import calendar-lite-dark.html rather than calendar-lite.html
-
 
 You can attach date-change event listener to it as shown below
 
@@ -114,18 +110,13 @@ By default present(today) day is selected, you can set a default date as shown b
     </calendar-lite>
  ```
 
+# \<timepicker-lite\>
 
-## To change theme
-
-To change main header color of calendar-lite
+Is a lite and simple time picker. The timepicker uses 24h format input.
 
 ```html
-
-    <calendar-lite main-color="#E91E63"  id="someid"></calendar-lite>
-
+    <timepicker-lite label="Time picker" value="18:23">
+    </timepicker-lite>
 ```
-You can use dark theme calendar by importing `calendar-lite-dark.html` instead of `calendar-lite.html`
 
-```html
-    <calendar-lite  id="someid"></calendar-lite>
- ```
+
