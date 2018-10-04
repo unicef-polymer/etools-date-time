@@ -3,7 +3,6 @@ import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/iron-icons/device-icons.js';
 
-
 /**
  * @customElement
  * @polymer
