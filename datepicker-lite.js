@@ -75,7 +75,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         }
 
         iron-icon[slot="suffix"] {
-          margin-right: 8px;
+          margin-left: 8px;
         }
 
         .clear-btn,
