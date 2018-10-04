@@ -66,9 +66,16 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         }
 
         iron-icon {
-          margin-right: 8px;
           cursor: pointer;
           @apply --datepicker-lite-icon
+        }
+
+        iron-icon[slot="prefix"] {
+          margin-right: 8px;
+        }
+
+        iron-icon[slot="suffix"] {
+          margin-right: 8px;
         }
 
         .clear-btn,
@@ -131,7 +138,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         <iron-icon on-keypress="_toggelOnKeyPress" icon="date-range" title="Toggle calendar" tabindex="1"
                    on-tap="toggleCalendar" slot="prefix"></iron-icon>
 
-        <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear"
+        <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear" tabindex="1"
                    hidden$="[[clearBtnInsideDr]]"></iron-icon>
 
         <div slot="input" class="paper-input-input">
