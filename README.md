@@ -1,11 +1,18 @@
-Polymer 3 version of datepicker based on https://github.com/Manohar-Gunturu/calendar-lite
-# \<calendar-lite\>
+# Etools date and time fields
+Polymer 3 components
 
-Multi select date picker or calendar `npm install git+https://github.com/unicef-polymer/etools-date-time.git`
+## Install
+`$ npm install git+https://github.com/unicef-polymer/etools-date-time.git`
 
-Calendar-lite is a Webcomponent build with Polymer. It gives a nice interface to play with it.
+## Description
+Polymer 3 components used for date and time fields.
 
-## Features
+### Components
+* \<datepicker-lite\>
+* \<calendar-lite\>
+* \<time-input\>
+
+### Calendar component features
 
 1. Set min, max date or default date,
 2. Select Multiple dates(consequent or random)
@@ -14,34 +21,13 @@ Calendar-lite is a Webcomponent build with Polymer. It gives a nice interface to
 5. triggers an event on date change(So you can update the value of an input field)
 6. triggers an event on month change(So you can set different disable dates for different months)
 
-<!---
-```
-<custom-element-demo>
-  <template>
-    <script src="../webcomponentsjs/webcomponents-lite.js"></script>
-    <link rel="import" href="calendar-lite.html">
-    <next-code-block></next-code-block>
-  </template>
-</custom-element-demo>
-```
--->
 ```html
 <calendar-lite></calendar-lite>
-```
 
-<!---
-```
-<custom-element-demo>
-  <template>
-    <script src="../webcomponentsjs/webcomponents-lite.js"></script>
-    <link rel="import" href="calendar-lite-dark.html">
-    <next-code-block></next-code-block>
-  </template>
-</custom-element-demo>
-```
--->
-```html
-<calendar-lite  id="someid" disabled-week-day='["Fri","Sun"]' multi-select='{"max":3,"consequent":true}'></calendar-lite>
+<calendar-lite  id="someid" 
+                disabled-week-day='["Fri","Sun"]' 
+                multi-select='{"max":3,"consequent":true}'>
+</calendar-lite>
 ```
 
 You can attach date-change event listener to it as shown below
@@ -110,7 +96,7 @@ By default present(today) day is selected, you can set a default date as shown b
     </calendar-lite>
  ```
 
-# \<time-input\>
+### Time input component features
 
 Is a lite and simple time picker. The time-input uses 24h format input.
 

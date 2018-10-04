@@ -1,9 +1,9 @@
 'use strict';
 import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-input/paper-input-error.js';
 import '@polymer/iron-icons/device-icons.js';
-
 
 /**
  * @customElement
@@ -14,8 +14,6 @@ class TimeInput extends PolymerElement {
     // language=HTML
     return html`
       <style>
-
-
         .paper-input-input input {
           font-size: inherit;
           border: 0;
@@ -32,6 +30,7 @@ class TimeInput extends PolymerElement {
         }
 
         iron-icon {
+          @apply --layout;
           margin-right: 8px;
           @apply --etools-time-icon
         }
@@ -59,7 +58,6 @@ class TimeInput extends PolymerElement {
           <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
         </template>
       </paper-input-container>
-      
 
 
     `;
@@ -75,17 +73,17 @@ class TimeInput extends PolymerElement {
       readonly: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       required: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       disabled: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       autoValidate: {
         type: Boolean,
@@ -186,6 +184,5 @@ class TimeInput extends PolymerElement {
   }
 
 }
-
 
 window.customElements.define('time-input', TimeInput);
