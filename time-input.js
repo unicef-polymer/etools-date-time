@@ -46,7 +46,7 @@ class TimeInput extends PolymerElement {
                              invalid="{{invalid}}"
                              value="[[value]]">
         <label hidden$=[[!label]] slot="label">[[label]]</label>
-        <iron-icon icon="device:access-time" slot="prefix" hidden$="[[!showIcon]]"></iron-icon>
+        <iron-icon icon="device:access-time" slot="prefix" hidden$="[[hideIcon]]"></iron-icon>
         <div slot="input" class="paper-input-input">
           <input value="{{hoursInput::input}}" on-blur="_formatHours" readonly$="[[readonly]]" placeholder="hh" type="number" min="1" max="23">:
           <input value="{{minutesInput::input}}" on-blur="_formatMinutes" readonly$="[[readonly]]" placeholder="mm" type="number" min="1"
@@ -98,9 +98,9 @@ class TimeInput extends PolymerElement {
         type: Boolean,
         value: false
       },
-      showIcon: {
+      hideIcon: {
         type: Boolean,
-        value: true
+        value: false
       }
     };
   }
