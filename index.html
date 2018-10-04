@@ -17,6 +17,22 @@
     <script type="module" src="./datepicker-lite.js"></script>
     <script type="module" src="./time-picker-lite.js"></script>
 
+    <style type="text/css">
+      .datepickers,
+      .time-inputs {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+      }
+      .datepickers > div {
+        width: 350px;
+      }
+
+      datepicker-lite {
+        width: 160px;
+      }
+    </style>
+
   </head>
   <body>
 
@@ -25,14 +41,22 @@
    <!--<calendar-lite id="excalendar" min-date="2016,12,9" multi-select='{"max":3,"consequent":false}'  disabled-week-day='["Fri"]'  disabled-days="[2,3,4]">-->
    <!--</calendar-lite>-->
 
-    <div style="width: 400px">
-      <datepicker-lite required$ label="Paper datepicker" ></datepicker-lite>
+    <div class="datepickers">
+      <div>
+        <datepicker-lite required$ label="Paper datepicker" ></datepicker-lite>
+      </div>
+
+      <div>
+        <datepicker-lite required$ label="Paper datepicker" ></datepicker-lite>
+      </div>
+
+      <div>
+        <datepicker-lite required$ label="Paper datepicker" ></datepicker-lite>
+      </div>
     </div>
 
-   <div style="width: 400px">
-     <timepicker-lite label="Time picker">
-
-     </timepicker-lite>
+   <div class="time-inputs">
+     <timepicker-lite label="Time picker"></timepicker-lite>
    </div>
   <script>
 

@@ -8,24 +8,27 @@ import './calendar-lite.js';
 
 var openedDatepickers = window.openedDatepickers || [];
 
-document.addEventListener('tap', (e) => {
-  let clickFromDatepiker = (e.target.tagName.toLowerCase() === 'datepicker-lite') ||
-      !!e.target.closest('datepicker-lite');
+(function() {
 
-  if (!clickFromDatepiker) {
-    closeCalendars();
+  const _closeDatepikers = (keepOpenDatepicker) => {
+    openedDatepickers.forEach((datePicker) => {
+      if (datePicker.opened && keepOpenDatepicker !== datePicker) {
+        datePicker.set('opened', false);
+      }
+    });
+
+    openedDatepickers = (keepOpenDatepicker && keepOpenDatepicker.opened) ? [keepOpenDatepicker] : [];
   }
-});
 
-function closeCalendars() {
-  openedDatepickers.forEach(function (element) {
-    if (element.opened) {
-      element.set('opened', false);
-    }
+  document.addEventListener('tap', (e) => {
+    let clickedDatepicker = (e.target.tagName.toLowerCase() === 'datepicker-lite') 
+                          ? e.target 
+                          : e.target.closest('datepicker-lite');
+    _closeDatepikers(clickedDatepicker);
   });
 
-  openedDatepickers = [];
-}
+})();
+
 
 /**
  * @customElement
@@ -249,13 +252,14 @@ class DatePickerLite extends PolymerElement {
     if (!this.readonly) {
       this.set('opened', !this.opened);
 
-      if (this.opened) {
-        openedDatepickers.push(this);
-      }
       if (openedDatepickers.length > 1){
         // the first opened datepicker should be closed and removed
         openedDatepickers[0].set('opened', false);
         openedDatepickers.shift();
+      }
+
+      if (this.opened) {
+        openedDatepickers.push(this);
       }
     }
   }
