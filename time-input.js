@@ -53,8 +53,6 @@ class TimeInput extends PolymerElement {
                  max="59">
         </div>
       </paper-input-container>
-
-
     `;
   }
 

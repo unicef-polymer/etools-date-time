@@ -1,31 +1,38 @@
 'use strict';
 import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
+import {GestureEventListeners} from '@polymer/polymer/lib/mixins/gesture-event-listeners.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/iron-icons/iron-icons.js';
+import '@polymer/paper-button/paper-button.js';
 
 import './calendar-lite.js';
 
-var openedDatepickers = window.openedDatepickers || [];
+var openedDatepickerLiteElems = window.openedDatepickerLiteElems || [];
 
 (function() {
 
-  const _closeDatepikers = (keepOpenDatepicker) => {
-    openedDatepickers.forEach((datePicker) => {
+  const _closeDatepickers = (keepOpenDatepicker) => {
+    openedDatepickerLiteElems.forEach((datePicker) => {
       if (datePicker.opened && keepOpenDatepicker !== datePicker) {
         datePicker.set('opened', false);
       }
     });
 
-    openedDatepickers = (keepOpenDatepicker && keepOpenDatepicker.opened) ? [keepOpenDatepicker] : [];
-  }
+    openedDatepickerLiteElems = (keepOpenDatepicker && keepOpenDatepicker.opened) ? [keepOpenDatepicker] : [];
+  };
 
-  document.addEventListener('tap', (e) => {
-    let clickedDatepicker = (e.target.tagName.toLowerCase() === 'datepicker-lite') 
-                          ? e.target 
-                          : e.target.closest('datepicker-lite');
-    _closeDatepikers(clickedDatepicker);
-  });
+  const _handleDatepickerLiteCloseOnClickOrTap = (e) => {
+    if (openedDatepickerLiteElems.length === 0) {
+      return;
+    }
+    let clickedDatepicker = (e.target.tagName.toLowerCase() === 'datepicker-lite')
+        ? e.target
+        : e.target.closest('datepicker-lite');
+    _closeDatepickers(clickedDatepicker);
+  };
+
+  document.addEventListener('tap', _handleDatepickerLiteCloseOnClickOrTap);
+  document.addEventListener('click', _handleDatepickerLiteCloseOnClickOrTap);
 
 })();
 
@@ -33,8 +40,9 @@ var openedDatepickers = window.openedDatepickers || [];
 /**
  * @customElement
  * @polymer
+ * @appliesMixin GestureEventListeners
  */
-class DatePickerLite extends PolymerElement {
+class DatePickerLite extends GestureEventListeners(PolymerElement) {
   static get template() {
     // language=HTML
     return html`
@@ -44,8 +52,11 @@ class DatePickerLite extends PolymerElement {
           display: block;
         }
 
-        paper-dropdown-menu {
-          width: 100%;
+        paper-input-container {
+          --paper-input-suffix: {
+            width: 14px;
+            height: 14px;
+          }
         }
 
         .paper-input-input input {
@@ -60,17 +71,20 @@ class DatePickerLite extends PolymerElement {
           @apply --datepicker-lite-icon
         }
 
+        .clear-btn,
+        .close-btn {
+          margin: 10px;
+        }
+
         .clear-btn {
-          /*background: var(--my-elem-primary);*/
-          background: #ff4747;
+          background: var(--datepiker-lite-clear-btn-bg, #ff4747);
           color: #fff;
           padding: 6px;
-          margin: 10px 0 10px 10px;
+
         }
 
         .close-btn {
           padding: 6px;
-          margin: 10px 0 10px 10px;
         }
 
         .monthInput {
@@ -84,9 +98,14 @@ class DatePickerLite extends PolymerElement {
         .yearInput {
           width: 40px;
         }
-        
+
         #calendar {
           margin-top: -10px;
+        }
+
+        .actions {
+          display: flex;
+          justify-content: flex-end;
         }
 
         /***************** this is used to remove arrows from inputs *****************************/
@@ -109,19 +128,26 @@ class DatePickerLite extends PolymerElement {
                              error-message="Invalid date.">
         <label hidden$=[[!label]] slot="label">[[label]]</label>
 
-        <iron-icon on-keypress="keyCalendar" icon="date-range" alt="toggle" title="toggle" tabindex="1"
-                    on-tap="toggleCalendar" slot="prefix"></iron-icon>
+        <iron-icon on-keypress="_toggelOnKeyPress" icon="date-range" title="Toggle calendar" tabindex="1"
+                   on-tap="toggleCalendar" slot="prefix"></iron-icon>
+
+        <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear"
+                   hidden$="[[clearBtnInsideDr]]"></iron-icon>
 
         <div slot="input" class="paper-input-input">
-          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm" type="number" min="1" max="12">/
-          <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number" min="1" max="31">/
-          <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy" type="number" min="1" max="9999">
+          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm"
+                 type="number" min="1" max="12">/
+          <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number"
+                 min="1" max="31">/
+          <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy"
+                 type="number" min="1" max="9999">
         </div>
       </paper-input-container>
 
       <calendar-lite id="calendar" on-date-change="datePicked" date="[[inputDate]]" hidden$="[[!opened]]">
-        <div slot="actions">
-          <paper-button raised class="clear-btn" on-tap="_clearData">Clear</paper-button>
+        <div class="actions" slot="actions">
+          <paper-button raised class="clear-btn" on-tap="_clearData" hidden$="[[!clearBtnInsideDr]]">Clear
+          </paper-button>
           <paper-button raised class="close-btn" on-tap="toggleCalendar">Close</paper-button>
         </div>
       </calendar-lite>
@@ -129,6 +155,7 @@ class DatePickerLite extends PolymerElement {
     `;
   }
 
+  // language=JS
   static get properties() {
     return {
       value: {
@@ -139,17 +166,17 @@ class DatePickerLite extends PolymerElement {
       readonly: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       required: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       disabled: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       label: String,
       monthInput: {
@@ -173,11 +200,15 @@ class DatePickerLite extends PolymerElement {
         type: Boolean,
         value: false
       },
+      clearBtnInsideDr: {
+        type: Boolean,
+        value: false
+      },
       _clearDateInProgress: Boolean,
       _stopDateCompute: Boolean,
       autoValidate: {
         type: Boolean,
-        value: false,
+        value: false
       },
       _allInputsFilled: {
         type: Boolean,
@@ -238,36 +269,34 @@ class DatePickerLite extends PolymerElement {
       }
 
       if (this._isValidYear() && this._isValidMonth() &&
-          this._isValidDay() && this._enteredDateIsValid() ) {
+          this._isValidDay() && this._enteredDateIsValid()) {
         let newDate = new Date(year, month - 1, day);
         this.set('inputDate', newDate);
         this.set('value', year + '-' + month + '-' + day);
       }
     }
-
-
   }
 
   toggleCalendar() {
     if (!this.readonly) {
       this.set('opened', !this.opened);
 
-      if (openedDatepickers.length > 1){
+      if (openedDatepickerLiteElems.length > 1) {
         // the first opened datepicker should be closed and removed
-        openedDatepickers[0].set('opened', false);
-        openedDatepickers.shift();
+        openedDatepickerLiteElems[0].set('opened', false);
+        openedDatepickerLiteElems.shift();
       }
 
       if (this.opened) {
-        openedDatepickers.push(this);
+        openedDatepickerLiteElems.push(this);
       }
     }
   }
 
-  keyCalendar(event){
+  _toggelOnKeyPress(event) {
     if (!this.readonly) {
-      if (event.which === 13 || event.button === 0){
-        this.set('opened', !this.opened);
+      if (event.which === 13 || event.button === 0) {
+        this.toggleCalendar();
       }
     }
   }
@@ -325,7 +354,7 @@ class DatePickerLite extends PolymerElement {
           this.set('invalid', false);
           return valid;
 
-        }else {
+        } else {
           this.set('invalid', true);
           valid = this._enteredDateIsValid();
           return valid;
