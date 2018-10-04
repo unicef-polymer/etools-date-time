@@ -52,13 +52,6 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           display: block;
         }
 
-        paper-input-container {
-          --paper-input-suffix: {
-            width: 14px;
-            height: 14px;
-          }
-        }
-
         .paper-input-input input {
           font-size: inherit;
           border: 0;
@@ -76,6 +69,8 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
         iron-icon[slot="suffix"] {
           margin-left: 8px;
+          width: 14px;
+          height: 14px;
         }
 
         .clear-btn,
