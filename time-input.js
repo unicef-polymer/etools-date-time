@@ -1,13 +1,14 @@
 'use strict';
 import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-input/paper-input.js';
+import '@polymer/iron-icons/device-icons.js';
 
 
 /**
  * @customElement
  * @polymer
  */
-class TimePickerLite extends PolymerElement {
+class TimeInput extends PolymerElement {
   static get template() {
     // language=HTML
     return html`
@@ -18,6 +19,7 @@ class TimePickerLite extends PolymerElement {
           font-size: inherit;
           border: 0;
           text-align: center;
+          width: var(--etools-time-inputs-width, 34px);
         }
 
         /***************** this is used to remove arrows from inputs *****************************/
@@ -26,6 +28,11 @@ class TimePickerLite extends PolymerElement {
         input[type=number]::-webkit-outer-spin-button {
           -webkit-appearance: none;
           margin: 0;
+        }
+
+        iron-icon {
+          margin-right: 8px;
+          @apply --etools-time-icon
         }
 
         *[hidden] {
@@ -39,6 +46,7 @@ class TimePickerLite extends PolymerElement {
                              invalid="{{invalid}}"
                              value="[[value]]">
         <label hidden$=[[!label]] slot="label">[[label]]</label>
+        <iron-icon icon="device:access-time" slot="prefix" hidden$="[[!showIcon]]"></iron-icon>
         <div slot="input" class="paper-input-input">
           <input value="{{hoursInput::input}}" on-blur="_formatHours" readonly$="[[readonly]]" placeholder="hh" type="number" min="1" max="23">:
           <input value="{{minutesInput::input}}" on-blur="_formatMinutes" readonly$="[[readonly]]" placeholder="mm" type="number" min="1"
@@ -78,7 +86,10 @@ class TimePickerLite extends PolymerElement {
       minutesInput: {
         type: Number
       },
-      label: String,
+      label: {
+        type: String,
+        value: 'Time'
+      },
       invalid: {
         type: Boolean,
         value: false
@@ -86,6 +97,10 @@ class TimePickerLite extends PolymerElement {
       _allInputsFilled: {
         type: Boolean,
         value: false
+      },
+      showIcon: {
+        type: Boolean,
+        value: true
       }
     };
   }
@@ -172,4 +187,4 @@ class TimePickerLite extends PolymerElement {
 }
 
 
-window.customElements.define('timepicker-lite', TimePickerLite);
+window.customElements.define('time-input', TimeInput);
