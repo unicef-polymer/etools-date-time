@@ -59,8 +59,8 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         }
 
         iron-icon {
+          @apply --layout;
           cursor: pointer;
-          @apply --datepicker-lite-icon
         }
 
         iron-icon[slot="prefix"] {

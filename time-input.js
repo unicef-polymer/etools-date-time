@@ -1,5 +1,6 @@
 'use strict';
 import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/iron-icons/device-icons.js';
 
@@ -28,6 +29,7 @@ class TimeInput extends PolymerElement {
         }
 
         iron-icon {
+          @apply --layout;
           margin-right: 8px;
           @apply --etools-time-icon
         }
