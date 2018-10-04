@@ -12,8 +12,6 @@ class TimeInput extends PolymerElement {
     // language=HTML
     return html`
       <style>
-
-
         .paper-input-input input {
           font-size: inherit;
           border: 0;
@@ -47,8 +45,10 @@ class TimeInput extends PolymerElement {
         <label hidden$=[[!label]] slot="label">[[label]]</label>
         <iron-icon icon="device:access-time" slot="prefix" hidden$="[[hideIcon]]"></iron-icon>
         <div slot="input" class="paper-input-input">
-          <input value="{{hoursInput::input}}" on-blur="_formatHours" readonly$="[[readonly]]" placeholder="hh" type="number" min="1" max="23">:
-          <input value="{{minutesInput::input}}" on-blur="_formatMinutes" readonly$="[[readonly]]" placeholder="mm" type="number" min="1"
+          <input value="{{hoursInput::input}}" on-blur="_formatHours" readonly$="[[readonly]]" placeholder="hh"
+                 type="number" min="1" max="23">:
+          <input value="{{minutesInput::input}}" on-blur="_formatMinutes" readonly$="[[readonly]]" placeholder="mm"
+                 type="number" min="1"
                  max="59">
         </div>
       </paper-input-container>
@@ -65,17 +65,17 @@ class TimeInput extends PolymerElement {
       readonly: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       required: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       disabled: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       hoursInput: {
         type: Number
@@ -105,7 +105,7 @@ class TimeInput extends PolymerElement {
   static get observers() {
     return [
       'computeTime(hoursInput, minutesInput)',
-        'inputFields(hoursInput, minutesInput)'
+      'inputFields(hoursInput, minutesInput)'
     ];
   }
 
@@ -148,7 +148,7 @@ class TimeInput extends PolymerElement {
   _formatHours() {
     if (isNaN(Number(this.hoursInput)) || Number(this.hoursInput) < 1 || Number(this.hoursInput) > 23) {
       this.set('hoursInput', undefined);
-    }else {
+    } else {
       this.hoursInput = this.hoursInput.length < 2 ? '0' + this.hoursInput : this.hoursInput;
     }
   }
@@ -156,7 +156,7 @@ class TimeInput extends PolymerElement {
   _formatMinutes() {
     if (isNaN(Number(this.minutesInput)) || Number(this.minutesInput) < 1 || Number(this.minutesInput) > 59) {
       this.set('minutesInput', undefined);
-    }else {
+    } else {
       this.minutesInput = this.minutesInput.length < 2 ? '0' + this.minutesInput : this.minutesInput;
     }
   }
@@ -182,6 +182,5 @@ class TimeInput extends PolymerElement {
   }
 
 }
-
 
 window.customElements.define('time-input', TimeInput);
