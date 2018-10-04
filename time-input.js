@@ -7,7 +7,7 @@ import '@polymer/paper-input/paper-input.js';
  * @customElement
  * @polymer
  */
-class TimePickerLite extends PolymerElement {
+class TimeInput extends PolymerElement {
   static get template() {
     // language=HTML
     return html`
@@ -172,4 +172,4 @@ class TimePickerLite extends PolymerElement {
 }
 
 
-window.customElements.define('timepicker-lite', TimePickerLite);
+window.customElements.define('time-input', TimeInput);

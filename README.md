@@ -110,13 +110,13 @@ By default present(today) day is selected, you can set a default date as shown b
     </calendar-lite>
  ```
 
-# \<timepicker-lite\>
+# \<time-input\>
 
-Is a lite and simple time picker. The timepicker uses 24h format input.
+Is a lite and simple time picker. The time-input uses 24h format input.
 
 ```html
-    <timepicker-lite label="Time picker" value="18:23">
-    </timepicker-lite>
+    <time-input label="Time picker" value="18:23">
+    </time-input>
 ```
 
 
