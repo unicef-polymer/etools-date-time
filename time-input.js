@@ -91,7 +91,7 @@ class TimeInput extends PolymerElement {
       },
       autoValidate: {
         type: Boolean,
-        value: true
+        value: false
       },
       hoursInput: {
         type: Number
@@ -110,14 +110,17 @@ class TimeInput extends PolymerElement {
       hideIcon: {
         type: Boolean,
         value: false
+      },
+      errorMessage: {
+        type: String,
+        value: 'Invalid time'
       }
     };
   }
 
   static get observers() {
     return [
-      'computeTime(hoursInput, minutesInput)',
-      // 'inputFields(hoursInput, minutesInput)'
+      'computeTime(hoursInput, minutesInput)'
     ];
   }
 

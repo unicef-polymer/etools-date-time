@@ -25,11 +25,13 @@
         flex-direction: row;
         flex: 1;
       }
-      .datepickers > div {
+      .datepickers > div,
+      .time-inputs > div {
         width: 350px;
       }
 
-      datepicker-lite {
+      datepicker-lite,
+      time-input {
         width: 200px;
       }
     </style>
@@ -52,16 +54,14 @@
       </div>
 
       <div>
-        <datepicker-lite required label="Datepicker" clear-btn-inside-dr></datepicker-lite>
+        <datepicker-lite required label="Datepicker" clear-btn-inside-dr auto-validate></datepicker-lite>
       </div>
 
-      <div>
-        <paper-input label="Some input" required error-message="Invalid text" auto-validate></paper-input>
-      </div>
     </div>
 
    <div class="time-inputs">
-     <time-input error-message="aaaaaaaaaaaaaaaaaaaa" ></time-input>
+     <div><time-input></time-input></div>
+     <div><time-input auto-validate required></time-input></div>
    </div>
   <script>
 

@@ -144,24 +144,27 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       <paper-input-container always-float-label
                              disabled$="[[disabled]]"
                              required$="[[required]]"
-                             invalid="{{invalid}}"
-                             error-message="Invalid date.">
+                             invalid="{{invalid}}">
         <label hidden$=[[!label]] slot="label">[[label]]</label>
 
         <iron-icon on-keypress="_toggelOnKeyPress" icon="date-range" title="Toggle calendar" tabindex="1"
                    on-tap="toggleCalendar" slot="prefix"></iron-icon>
+        
+        <div slot="input" class="paper-input-input">
+          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm"
+                 type="number" min="1" max="12" on-blur="_handleOnBlur">/
+          <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number"
+                 min="1" max="31" on-blur="_handleOnBlur">/
+          <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy"
+                 type="number" min="1" max="9999" on-blur="_handleOnBlur">
+        </div>
 
         <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear" tabindex="1"
                    hidden$="[[clearBtnInsideDr]]"></iron-icon>
 
-        <div slot="input" class="paper-input-input">
-          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm"
-                 type="number" min="1" max="12">/
-          <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number"
-                 min="1" max="31">/
-          <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy"
-                 type="number" min="1" max="9999">
-        </div>
+        <template is="dom-if" if="[[errorMessage]]">
+          <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
+        </template>
       </paper-input-container>
 
       <calendar-lite id="calendar" on-date-change="datePicked" date="[[inputDate]]" hidden$="[[!opened]]">
@@ -192,6 +195,10 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         type: Boolean,
         value: false,
         reflectToAttribute: true
+      },
+      errorMessage: {
+        type: String,
+        value: 'Invalid date'
       },
       disabled: {
         type: Boolean,
@@ -229,18 +236,13 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       autoValidate: {
         type: Boolean,
         value: false
-      },
-      _allInputsFilled: {
-        type: Boolean,
-        value: false
       }
     };
   }
 
   static get observers() {
     return [
-      'computeDate(monthInput, dayInput, yearInput)',
-      'inputFields(monthInput, dayInput, yearInput)'
+      'computeDate(monthInput, dayInput, yearInput)'
     ];
   }
 
@@ -282,7 +284,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       this.set('invalid', !this._isValidYear() || !this._isValidMonth() || !this._isValidDay());
     }
 
-    if (this._allInputsFilled) {
+    if (month !== undefined && day !== undefined && year !== undefined) {
       if (this._stopDateCompute) {
         // prevent setting wrong value when year/month/day are set by datepiker in datePicked
         return;
@@ -326,7 +328,11 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     this.set('dayInput', undefined);
     this.set('yearInput', undefined);
     this.set('value', null);
-    this.set('invalid', false);
+    if (this.autoValidate) {
+      this.validate();
+    } else {
+      this.set('invalid', false);
+    }
   }
 
   _isValidYear() {
@@ -360,31 +366,12 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
   validate() {
     let valid = true;
 
-    if ((this._isValidMonth() && this._isValidDay() && this._isValidYear()) && this.required) {
+    if (this.required) {
+      valid = this._isValidMonth() && this._isValidDay() && this._isValidYear() && this._enteredDateIsValid();
+    } else {
       valid = this._enteredDateIsValid();
-      this.set('invalid', !this._enteredDateIsValid());
-      return valid;
-
-    } else if (!this.required) {
-      if (this.monthInput !== undefined || this.dayInput !== undefined || this.yearInput !== undefined) {
-        if (this._isValidMonth() && this._isValidDay() && this._isValidYear()) {
-          valid = this._enteredDateIsValid();
-          this.set('invalid', false);
-          return valid;
-
-        } else {
-          this.set('invalid', true);
-          valid = this._enteredDateIsValid();
-          return valid;
-        }
-      }
-
-      valid = this._enteredDateIsValid();
-      this.set('invalid', false);
-      return valid;
     }
-
-    this.set('invalid', true);
+    this.set('invalid', !valid);
     return valid;
   }
 
@@ -408,9 +395,9 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     }
   }
 
-  inputFields(month, day, year) {
-    if (month !== undefined && day !== undefined && year !== undefined) {
-      this.set('_allInputsFilled', true);
+  _handleOnBlur() {
+    if (this.autoValidate) {
+      this.validate();
     }
   }
 
