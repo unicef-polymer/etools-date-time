@@ -16,6 +16,7 @@
     <script type="module" src="./calendar-lite.js"></script>
     <script type="module" src="./datepicker-lite.js"></script>
     <script type="module" src="time-input.js"></script>
+    <script type="module" src="./node_modules/@polymer/paper-input/paper-input.js"></script>
 
     <style type="text/css">
       .datepickers,
@@ -53,10 +54,14 @@
       <div>
         <datepicker-lite required label="Datepicker" clear-btn-inside-dr></datepicker-lite>
       </div>
+
+      <div>
+        <paper-input label="Some input" required error-message="Invalid text" auto-validate></paper-input>
+      </div>
     </div>
 
    <div class="time-inputs">
-     <time-input></time-input>
+     <time-input error-message="aaaaaaaaaaaaaaaaaaaa" ></time-input>
    </div>
   <script>
 

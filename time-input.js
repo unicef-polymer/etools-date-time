@@ -2,6 +2,7 @@
 import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-input/paper-input.js';
+import '@polymer/paper-input/paper-input-error.js';
 import '@polymer/iron-icons/device-icons.js';
 
 /**
@@ -51,13 +52,18 @@ class TimeInput extends PolymerElement {
         <label hidden$=[[!label]] slot="label">[[label]]</label>
         <iron-icon icon="device:access-time" slot="prefix" hidden$="[[hideIcon]]"></iron-icon>
         <div slot="input" class="paper-input-input">
-          <input value="{{hoursInput::input}}" on-blur="_formatHours" readonly$="[[readonly]]" placeholder="hh"
+          <input value="{{hoursInput::input}}" on-blur="_formatHour" readonly$="[[readonly]]" placeholder="hh"
                  type="number" min="1" max="23">:
           <input value="{{minutesInput::input}}" on-blur="_formatMinutes" readonly$="[[readonly]]" placeholder="mm"
                  type="number" min="1"
                  max="59">
         </div>
+        <template is="dom-if" if="[[errorMessage]]">
+          <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
+        </template>
       </paper-input-container>
+
+
     `;
   }
 
@@ -83,6 +89,10 @@ class TimeInput extends PolymerElement {
         value: false,
         reflectToAttribute: true
       },
+      autoValidate: {
+        type: Boolean,
+        value: true
+      },
       hoursInput: {
         type: Number
       },
@@ -97,10 +107,6 @@ class TimeInput extends PolymerElement {
         type: Boolean,
         value: false
       },
-      _allInputsFilled: {
-        type: Boolean,
-        value: false
-      },
       hideIcon: {
         type: Boolean,
         value: false
@@ -111,7 +117,7 @@ class TimeInput extends PolymerElement {
   static get observers() {
     return [
       'computeTime(hoursInput, minutesInput)',
-      'inputFields(hoursInput, minutesInput)'
+      // 'inputFields(hoursInput, minutesInput)'
     ];
   }
 
@@ -129,31 +135,22 @@ class TimeInput extends PolymerElement {
 
   }
 
-  _isValidHour() {
-    return this.hoursInput >= 1 && this.hoursInput <= 23 && String(this.hoursInput).length <= 2;
-  }
-
-  _isValidMinute() {
-    return this.minutesInput >= 1 && this.minutesInput <= 59 && String(this.minutesInput).length <= 2;
-  }
-
-  inputFields(hours, minutes) {
-    if (hours !== undefined && minutes !== undefined) {
-      this.set('_allInputsFilled', true);
-    }
-  }
-
   computeTime(hours, minutes) {
-    if (this._allInputsFilled) {
+    if (hours !== undefined && minutes !== undefined) {
+      if (this.autoValidate && this._isValidHours() && this._isValidMinutes()) {
+        this.set('invalid', false);
+      }
       this.set('hoursInput', hours);
       this.set('minutesInput', minutes);
       this.set('value', hours + ':' + minutes);
     }
   }
 
-  _formatHours() {
+  _formatHour() {
     if (isNaN(Number(this.hoursInput)) || Number(this.hoursInput) < 1 || Number(this.hoursInput) > 23) {
-      this.set('hoursInput', undefined);
+      if (this.autoValidate) {
+        this.set('invalid', true);
+      }
     } else {
       this.hoursInput = this.hoursInput.length < 2 ? '0' + this.hoursInput : this.hoursInput;
     }
@@ -161,18 +158,20 @@ class TimeInput extends PolymerElement {
 
   _formatMinutes() {
     if (isNaN(Number(this.minutesInput)) || Number(this.minutesInput) < 1 || Number(this.minutesInput) > 59) {
-      this.set('minutesInput', undefined);
+      if (this.autoValidate) {
+        this.set('invalid', true);
+      }
     } else {
       this.minutesInput = this.minutesInput.length < 2 ? '0' + this.minutesInput : this.minutesInput;
     }
   }
 
   _isValidHours() {
-    return isNaN(this.hoursInput) || this.hoursInput < 1 || this.hoursInput > 23;
+    return Number(this.hoursInput) >= 0 && Number(this.hoursInput) < 24;
   }
 
   _isValidMinutes() {
-    return isNaN(this.minutesInput) || this.minutesInput < 1 || this.minutesInput > 59;
+    return Number(this.minutesInput) >= 0 && Number(this.minutesInput) < 60;
   }
 
   _clearData() {
@@ -183,8 +182,9 @@ class TimeInput extends PolymerElement {
   }
 
   validate() {
-    this.set('invalid', this._isValidHours() || this._isValidMinutes());
-    return this._isValidHours() || this._isValidMinutes();
+    const valid = this._isValidHours() && this._isValidMinutes();
+    this.set('invalid', !valid);
+    return valid;
   }
 
 }
