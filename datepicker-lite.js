@@ -8,34 +8,52 @@ import '@polymer/paper-button/paper-button.js';
 import './calendar-lite.js';
 
 var openedDatepickerLiteElems = window.openedDatepickerLiteElems || [];
+var openedDatepickerLiteElemsCloseTimeout = window.openedDatepickerLiteElemsCloseTimeout || null;
 
-(function() {
-
-  const _closeDatepickers = (keepOpenDatepicker) => {
-    openedDatepickerLiteElems.forEach((datePicker) => {
-      if (datePicker.opened && keepOpenDatepicker !== datePicker) {
-        datePicker.set('opened', false);
-      }
-    });
-
-    openedDatepickerLiteElems = (keepOpenDatepicker && keepOpenDatepicker.opened) ? [keepOpenDatepicker] : [];
-  };
-
-  const _handleDatepickerLiteCloseOnClickOrTap = (e) => {
-    if (openedDatepickerLiteElems.length === 0) {
-      return;
+const _closeDatepickers = (keepOpenDatepicker) => {
+  openedDatepickerLiteElems.forEach((datePicker) => {
+    if (datePicker.opened && keepOpenDatepicker !== datePicker) {
+      datePicker.set('opened', false);
     }
-    let clickedDatepicker = (e.target.tagName.toLowerCase() === 'datepicker-lite')
-        ? e.target
-        : e.target.closest('datepicker-lite');
-    _closeDatepickers(clickedDatepicker);
-  };
+  });
 
-  document.addEventListener('tap', _handleDatepickerLiteCloseOnClickOrTap);
-  document.addEventListener('click', _handleDatepickerLiteCloseOnClickOrTap);
+  openedDatepickerLiteElems = (keepOpenDatepicker && keepOpenDatepicker.opened) ? [keepOpenDatepicker] : [];
+};
 
-})();
+const _getClickedDatepicker = (e) => {
+  let clickedDatepicker = (e.target.tagName.toLowerCase() === 'datepicker-lite')
+      ? e.target
+      : e.target.closest('datepicker-lite');
+  if (!clickedDatepicker) {
+    // check event path (case when event target has been changed, related to event retargetting)
+    if (e.path instanceof Array) {
+      for (let i = 0; i < e.path.length; i++) {
+        if (e.path[i] && e.path[i].tagName && e.path[i].tagName.toLowerCase() === 'datepicker-lite') {
+          clickedDatepicker = e.path[i];
+          break;
+        }
+      }
+    }
+  }
+  return clickedDatepicker;
+};
 
+const _handleDatepickerLiteCloseOnClickOrTap = (e) => {
+  if (openedDatepickerLiteElems.length === 0 || openedDatepickerLiteElemsCloseTimeout !== null) {
+    return;
+  }
+  // timeout is used for debouncing Event and MouseEvent
+  openedDatepickerLiteElemsCloseTimeout = setTimeout(() => {
+    const clickedDatepicker = _getClickedDatepicker(e);
+    openedDatepickerLiteElemsCloseTimeout = null;
+    if (!(openedDatepickerLiteElems.length === 1 && openedDatepickerLiteElems[0] === clickedDatepicker)) {
+      _closeDatepickers(clickedDatepicker);
+    }
+  }, 10);
+};
+
+document.addEventListener('tap', _handleDatepickerLiteCloseOnClickOrTap);
+document.addEventListener('click', _handleDatepickerLiteCloseOnClickOrTap);
 
 /**
  * @customElement
@@ -283,10 +301,8 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     if (!this.readonly) {
       this.set('opened', !this.opened);
 
-      if (openedDatepickerLiteElems.length > 1) {
-        // the first opened datepicker should be closed and removed
-        openedDatepickerLiteElems[0].set('opened', false);
-        openedDatepickerLiteElems.shift();
+      if (openedDatepickerLiteElems.length > 0) {
+        _closeDatepickers();
       }
 
       if (this.opened) {
