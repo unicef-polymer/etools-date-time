@@ -13,6 +13,10 @@ class TimeInput extends PolymerElement {
     // language=HTML
     return html`
       <style>
+        :host {
+          display: block;
+        }
+        
         .paper-input-input input {
           font-size: inherit;
           border: 0;
