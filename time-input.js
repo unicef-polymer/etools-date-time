@@ -145,7 +145,7 @@ class TimeInput extends PolymerElement {
       }
       this.set('hoursInput', hours);
       this.set('minutesInput', minutes);
-      this.set('value', hours + ':' + minutes);
+      this.set('value', hours + ':' + minutes + ':00');
     }
   }
 
