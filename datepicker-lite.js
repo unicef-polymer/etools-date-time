@@ -167,7 +167,8 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         </template>
       </paper-input-container>
 
-      <calendar-lite id="calendar" on-date-change="datePicked" date="[[inputDate]]" hidden$="[[!opened]]">
+      <calendar-lite id="calendar" on-date-change="datePicked" date="[[inputDate]]" min-date="[[minDate]]"
+                     max-date="[[maxDate]]" hidden$="[[!opened]]">
         <div class="actions" slot="actions">
           <paper-button raised class="clear-btn" on-tap="_clearData" hidden$="[[!clearBtnInsideDr]]">Clear
           </paper-button>
@@ -236,7 +237,9 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       autoValidate: {
         type: Boolean,
         value: false
-      }
+      },
+      minDate: Date,
+      maxDate: Date
     };
   }
 
