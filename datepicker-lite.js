@@ -392,7 +392,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     this.set('yearInput', dData[0]);
     this._stopDateCompute = false;
 
-    const d = new Date(newValue);
+    const d = new Date(dData[0], Number(dData[1]) - 1, dData[2]);
     if (d.toString() !== 'Invalid Date') {
       this.set('inputDate', d);
     }
