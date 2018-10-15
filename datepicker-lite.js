@@ -12,12 +12,15 @@ var openedDatepickerLiteElemsCloseTimeout = window.openedDatepickerLiteElemsClos
 
 const _closeDatepickers = (keepOpenDatepicker) => {
   openedDatepickerLiteElems.forEach((datePicker) => {
-    if (datePicker.opened && keepOpenDatepicker !== datePicker) {
-      datePicker.set('opened', false);
+    console.log(datePicker, keepOpenDatepicker);
+    if (datePicker.calendar.opened && keepOpenDatepicker !== datePicker.calendar) {
+      datePicker.calendar.set('opened', false);
     }
   });
 
-  openedDatepickerLiteElems = (keepOpenDatepicker && keepOpenDatepicker.opened) ? [keepOpenDatepicker] : [];
+  openedDatepickerLiteElems = (keepOpenDatepicker && keepOpenDatepicker.opened)
+      ? [{keepOpen: false, calendar: keepOpenDatepicker}]
+      : [];
 };
 
 const _getClickedDatepicker = (e) => {
@@ -25,14 +28,9 @@ const _getClickedDatepicker = (e) => {
       ? e.target
       : e.target.closest('datepicker-lite');
   if (!clickedDatepicker) {
-    // check event path (case when event target has been changed, related to event retargetting)
-    if (e.path instanceof Array) {
-      for (let i = 0; i < e.path.length; i++) {
-        if (e.path[i] && e.path[i].tagName && e.path[i].tagName.toLowerCase() === 'datepicker-lite') {
-          clickedDatepicker = e.path[i];
-          break;
-        }
-      }
+    const openedDatepikerMap = openedDatepickerLiteElems.find(d => d.keepOpen === true);
+    if (openedDatepikerMap && openedDatepikerMap.keepOpen) {
+      clickedDatepicker = openedDatepikerMap.calendar;
     }
   }
   return clickedDatepicker;
@@ -149,7 +147,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
         <iron-icon on-keypress="_toggelOnKeyPress" icon="date-range" title="Toggle calendar" tabindex="1"
                    on-tap="toggleCalendar" slot="prefix"></iron-icon>
-        
+
         <div slot="input" class="paper-input-input">
           <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm"
                  type="number" min="1" max="12" on-blur="_handleOnBlur">/
@@ -249,6 +247,21 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     ];
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener('tap', () => {
+      if (openedDatepickerLiteElems.length === 0) {
+        return;
+      }
+      for (let i = 0; i < openedDatepickerLiteElems.length; i++) {
+        if (openedDatepickerLiteElems[i].calendar === this && this.opened) {
+          openedDatepickerLiteElems[i].keepOpen = true;
+          break;
+        }
+      }
+    });
+  }
+
   _getDateString(date) {
     let month = '' + (date.getMonth() + 1);
     let day = '' + date.getDate();
@@ -311,7 +324,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       }
 
       if (this.opened) {
-        openedDatepickerLiteElems.push(this);
+        openedDatepickerLiteElems.push({keepOpen: true, calendar: this});
       }
     }
   }
@@ -392,7 +405,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     this.set('yearInput', dData[0]);
     this._stopDateCompute = false;
 
-    const d = new Date(newValue);
+    const d = new Date(dData[0], Number(dData[1]) - 1, dData[2]);
     if (d.toString() !== 'Invalid Date') {
       this.set('inputDate', d);
     }
