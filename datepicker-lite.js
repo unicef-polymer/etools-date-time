@@ -12,7 +12,6 @@ var openedDatepickerLiteElemsCloseTimeout = window.openedDatepickerLiteElemsClos
 
 const _closeDatepickers = (keepOpenDatepicker) => {
   openedDatepickerLiteElems.forEach((datePicker) => {
-    console.log(datePicker, keepOpenDatepicker);
     if (datePicker.calendar.opened && keepOpenDatepicker !== datePicker.calendar) {
       datePicker.calendar.set('opened', false);
     }
