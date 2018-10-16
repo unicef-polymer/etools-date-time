@@ -160,7 +160,7 @@ class TimeInput extends PolymerElement {
   }
 
   _formatMinutes() {
-    if (isNaN(Number(this.minutesInput)) || Number(this.minutesInput) < 1 || Number(this.minutesInput) > 59) {
+    if (isNaN(Number(this.minutesInput)) || Number(this.minutesInput) < 0 || Number(this.minutesInput) > 59) {
       if (this.autoValidate) {
         this.set('invalid', true);
       }
