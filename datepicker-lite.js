@@ -156,8 +156,11 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
                  type="number" min="1" max="9999" on-blur="_handleOnBlur">
         </div>
 
-        <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear" tabindex="1"
-                   hidden$="[[clearBtnInsideDr]]"></iron-icon>
+        <template is="dom-if" if="[[!readonly]]">
+          <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear" tabindex="1"
+                     hidden$="[[clearBtnInsideDr]]"></iron-icon>
+        </template>
+        
 
         <template is="dom-if" if="[[errorMessage]]">
           <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
@@ -167,8 +170,11 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       <calendar-lite id="calendar" on-date-change="datePicked" date="[[inputDate]]" min-date="[[minDate]]"
                      max-date="[[maxDate]]" hidden$="[[!opened]]">
         <div class="actions" slot="actions">
-          <paper-button raised class="clear-btn" on-tap="_clearData" hidden$="[[!clearBtnInsideDr]]">Clear
-          </paper-button>
+          <template is="dom-if" if="[[!readonly]]">
+            <paper-button raised class="clear-btn" on-tap="_clearData" hidden$="[[!clearBtnInsideDr]]">Clear
+            </paper-button>
+          </template>
+          
           <paper-button raised class="close-btn" on-tap="toggleCalendar">Close</paper-button>
         </div>
       </calendar-lite>
