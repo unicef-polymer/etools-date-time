@@ -406,7 +406,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     this._stopDateCompute = true;
     const dData = newValue.split('-');
     this.set('monthInput', dData[1]);
-    this.set('dayInput', dData[2]);
+    this.set('dayInput', dData[2].slice(0,2));
     this.set('yearInput', dData[0]);
     this._stopDateCompute = false;
 
