@@ -403,8 +403,12 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       }
       return;
     }
-    this._stopDateCompute = true;
     const dData = newValue.split('-');
+    if (dData.length !== 3) {
+      // value need to be yyyy-mm-dd format
+      return;
+    }
+    this._stopDateCompute = true;
     this.set('monthInput', dData[1]);
     this.set('dayInput', dData[2].slice(0,2));
     this.set('yearInput', dData[0]);
