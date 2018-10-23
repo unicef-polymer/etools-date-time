@@ -88,6 +88,10 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           height: 14px;
         }
 
+        iron-icon[readonly] {
+          cursor: default;
+        }
+
         .clear-btn,
         .close-btn {
           margin: 10px;
@@ -144,7 +148,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
                              invalid="{{invalid}}">
         <label hidden$=[[!label]] slot="label">[[label]]</label>
 
-        <iron-icon on-keypress="_toggelOnKeyPress" icon="date-range" title="Toggle calendar" tabindex="1"
+        <iron-icon on-keypress="_toggelOnKeyPress" readonly$="[[readonly]]" icon="date-range" title="Toggle calendar" tabindex="1"
                    on-tap="toggleCalendar" slot="prefix"></iron-icon>
 
         <div slot="input" class="paper-input-input">
