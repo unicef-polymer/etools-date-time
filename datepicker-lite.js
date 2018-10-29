@@ -178,8 +178,11 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
             <paper-button raised class="clear-btn" on-tap="_clearData" hidden$="[[!clearBtnInsideDr]]">Clear
             </paper-button>
           </template>
+
+          <template is="dom-if" if="[[!closeOnSelect]]">
+            <paper-button raised class="close-btn" on-tap="toggleCalendar">Close</paper-button>
+          </template>
           
-          <paper-button raised class="close-btn" on-tap="toggleCalendar">Close</paper-button>
         </div>
       </calendar-lite>
 
@@ -236,6 +239,10 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         value: false
       },
       clearBtnInsideDr: {
+        type: Boolean,
+        value: false
+      },
+      closeOnSelect: {
         type: Boolean,
         value: false
       },
@@ -300,6 +307,9 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     this.set('dayInput', day);
     this.set('yearInput', year);
     this.value = this._getDateString(date);
+    if (this.closeOnSelect) {
+      _closeDatepickers();
+    }
     this._stopDateCompute = false;
   }
 
