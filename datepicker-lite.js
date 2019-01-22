@@ -84,8 +84,8 @@ class DatePickerLite extends PolymerElement {
             <iron-icon on-keypress="keyCalendar" icon="date-range" alt="toggle" title="toggle" tabindex="1"
                     on-tap="toggleCalendar"></iron-icon>
           </span>
-          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm" type="number" min="1" max="12">/
           <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number" min="1" max="31">/
+          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm" type="number" min="1" max="12">/
           <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy" type="number" min="1" max="9999">
         </div>
       </paper-input-container>
