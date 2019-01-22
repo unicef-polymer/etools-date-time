@@ -152,12 +152,14 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
                    on-tap="toggleCalendar" slot="prefix"></iron-icon>
 
         <div slot="input" class="paper-input-input">
-          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm"
-                 type="number" min="1" max="12" on-blur="_handleOnBlur">/
+
           <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number"
                  min="1" max="31" on-blur="_handleOnBlur">/
+          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm"
+                 type="number" min="1" max="12" on-blur="_handleOnBlur">/
           <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy"
                  type="number" min="1" max="9999" on-blur="_handleOnBlur">
+
         </div>
 
         <template is="dom-if" if="[[!readonly]]">
