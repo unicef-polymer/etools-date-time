@@ -166,7 +166,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear" tabindex="1"
                      hidden$="[[clearBtnInsideDr]]"></iron-icon>
         </template>
-        
+
 
         <template is="dom-if" if="[[errorMessage]]">
           <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
@@ -184,7 +184,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           <template is="dom-if" if="[[!closeOnSelect]]">
             <paper-button raised class="close-btn" on-tap="toggleCalendar">Close</paper-button>
           </template>
-          
+
         </div>
       </calendar-lite>
 
@@ -255,7 +255,12 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         value: false
       },
       minDate: Date,
-      maxDate: Date
+      maxDate: Date,
+      fireDateHasChanged: {
+        type: Boolean,
+        value: false
+      },
+
     };
   }
 
@@ -309,6 +314,13 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     this.set('dayInput', day);
     this.set('yearInput', year);
     this.value = this._getDateString(date);
+    if (this.fireDateHasChanged) {
+      this.dispatchEvent(new CustomEvent('date-has-changed', {
+        detail: {date: date},
+        bubbles: true,
+        composed: true
+      }));
+    }
     if (this.closeOnSelect) {
       _closeDatepickers();
     }
