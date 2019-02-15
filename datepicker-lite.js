@@ -265,11 +265,11 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       },
       minDateErrorMsg: {
         type: String,
-        value: 'Date is earlier than min date allowed'
+        value: 'Date is earlier than min date'
       },
       maxDateErrorMsg: {
         type: String,
-        value: 'Date exceeds max date allowed'
+        value: 'Date exceeds max date'
       },
       requiredErrorMsg: {
         type: String
