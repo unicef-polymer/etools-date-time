@@ -140,6 +140,9 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         *[hidden] {
           display: none;
         }
+        input[type=number] {
+          background-color: initial;
+        }
       </style>
 
       <paper-input-container always-float-label
@@ -260,6 +263,17 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         type: Boolean,
         value: false
       },
+      minDateErrorMsg: {
+        type: String,
+        value: 'Date is earlier than min date allowed'
+      },
+      maxDateErrorMsg: {
+        type: String,
+        value: 'Date exceeds max date allowed'
+      },
+      requiredErrorMsg: {
+        type: String
+      }
 
     };
   }
@@ -407,21 +421,60 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     let newMonth = newDate.getMonth() + 1;
     let newDay = newDate.getDate();
 
-    return newMonth === Number(this.monthInput) &&
+    let valid = newMonth === Number(this.monthInput) &&
         newDay === Number(this.dayInput) &&
         newYear === Number(this.yearInput);
+    if (!valid) {
+      this.errorMessage = 'Invalid date';
+    }
+    return valid;
   }
 
   validate() {
     let valid = true;
 
-    if (this.required) {
-      valid = this._isValidMonth() && this._isValidDay() && this._isValidYear() && this._enteredDateIsValid();
-    } else {
+    valid = this.requiredValidation() && this.maxDateValidation()
+            && this.minDateValidation();
+
+    if (valid) {
       valid = this._enteredDateIsValid();
     }
+
     this.set('invalid', !valid);
     return valid;
+  }
+
+  maxDateValidation() {
+    if (this.maxDate) {
+      let valid = this.value <= this.maxDate;
+      if (!valid) {
+        this.errorMessage = this.maxDateErrorMsg;
+      }
+      return valid;
+    }
+    return true;
+  }
+
+  minDateValidation() {
+    if (this.minDate) {
+      let valid = this.value >= this.minDate;
+      if (!valid) {
+        this.errorMessage = this.minDateErrorMsg;
+      }
+      return valid;
+    }
+    return true;
+  }
+
+  requiredValidation() {
+    if (this.required) {
+      let valid = this._isValidMonth() && this._isValidDay() && this._isValidYear() && this._enteredDateIsValid();
+      if (!valid) {
+        this.errorMessage = this.requiredErrorMsg ? this.requiredErrorMsg : (this.maxDate ? 'This field is required' : this.errorMessage);
+      }
+      return valid;
+    }
+    return true;
   }
 
   _valueChanged(newValue) {
