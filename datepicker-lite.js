@@ -143,6 +143,10 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         input[type=number] {
           background-color: initial;
         }
+        
+        calendar-lite {
+            z-index: 130;
+        }
       </style>
 
       <paper-input-container always-float-label
