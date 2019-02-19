@@ -5,7 +5,11 @@ import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-iconset-svg/iron-iconset-svg.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-styles/element-styles/paper-material-styles.js';
-import moment from 'moment';
+
+const moment = window.moment;
+if (!moment) {
+  throw new Error('CalendarLite: momentjs is not loaded');
+}
 
 class CalendarLite extends GestureEventListeners(PolymerElement) {
   static get template() {
