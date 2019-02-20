@@ -1,23 +1,28 @@
 'use strict';
 import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-input/paper-input.js';
-
+import '@polymer/paper-input/paper-input-error.js';
+import '@polymer/iron-icons/device-icons.js';
 
 /**
  * @customElement
  * @polymer
  */
-class TimePickerLite extends PolymerElement {
+class TimeInput extends PolymerElement {
   static get template() {
     // language=HTML
     return html`
       <style>
-
-
+        :host {
+          display: block;
+        }
+        
         .paper-input-input input {
           font-size: inherit;
           border: 0;
           text-align: center;
+          width: var(--etools-time-inputs-width, 34px);
         }
 
         /***************** this is used to remove arrows from inputs *****************************/
@@ -26,6 +31,17 @@ class TimePickerLite extends PolymerElement {
         input[type=number]::-webkit-outer-spin-button {
           -webkit-appearance: none;
           margin: 0;
+        }
+
+        input[type=number] {
+          background-color: transparent;
+          -moz-appearance: textfield;
+        }
+
+        iron-icon {
+          @apply --layout;
+          margin-right: 8px;
+          @apply --etools-time-icon
         }
 
         *[hidden] {
@@ -39,11 +55,17 @@ class TimePickerLite extends PolymerElement {
                              invalid="{{invalid}}"
                              value="[[value]]">
         <label hidden$=[[!label]] slot="label">[[label]]</label>
+        <iron-icon icon="device:access-time" slot="prefix" hidden$="[[hideIcon]]"></iron-icon>
         <div slot="input" class="paper-input-input">
-          <input value="{{hoursInput::input}}" on-blur="_formatHours" readonly$="[[readonly]]" placeholder="hh" type="number" min="1" max="23">:
-          <input value="{{minutesInput::input}}" on-blur="_formatMinutes" readonly$="[[readonly]]" placeholder="mm" type="number" min="1"
+          <input value="{{hoursInput::input}}" on-blur="_formatHour" readonly$="[[readonly]]" placeholder="hh"
+                 type="number" min="1" max="23">:
+          <input value="{{minutesInput::input}}" on-blur="_formatMinutes" readonly$="[[readonly]]" placeholder="mm"
+                 type="number" min="1"
                  max="59">
         </div>
+        <template is="dom-if" if="[[errorMessage]]">
+          <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
+        </template>
       </paper-input-container>
 
 
@@ -60,17 +82,21 @@ class TimePickerLite extends PolymerElement {
       readonly: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       required: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       disabled: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
+      },
+      autoValidate: {
+        type: Boolean,
+        value: false
       },
       hoursInput: {
         type: Number
@@ -78,22 +104,28 @@ class TimePickerLite extends PolymerElement {
       minutesInput: {
         type: Number
       },
-      label: String,
+      label: {
+        type: String,
+        value: 'Time'
+      },
       invalid: {
         type: Boolean,
         value: false
       },
-      _allInputsFilled: {
+      hideIcon: {
         type: Boolean,
         value: false
+      },
+      errorMessage: {
+        type: String,
+        value: 'Invalid time'
       }
     };
   }
 
   static get observers() {
     return [
-      'computeTime(hoursInput, minutesInput)',
-        'inputFields(hoursInput, minutesInput)'
+      'computeTime(hoursInput, minutesInput)'
     ];
   }
 
@@ -111,50 +143,43 @@ class TimePickerLite extends PolymerElement {
 
   }
 
-  _isValidHour() {
-    return this.hoursInput >= 1 && this.hoursInput <= 23 && String(this.hoursInput).length <= 2;
-  }
-
-  _isValidMinute() {
-    return this.minutesInput >= 1 && this.minutesInput <= 59 && String(this.minutesInput).length <= 2;
-  }
-
-  inputFields(hours, minutes) {
-    if (hours !== undefined && minutes !== undefined) {
-      this.set('_allInputsFilled', true);
-    }
-  }
-
   computeTime(hours, minutes) {
-    if (this._allInputsFilled) {
+    if (hours !== undefined && minutes !== undefined) {
+      if (this.autoValidate && this._isValidHours() && this._isValidMinutes()) {
+        this.set('invalid', false);
+      }
       this.set('hoursInput', hours);
       this.set('minutesInput', minutes);
-      this.set('value', hours + ':' + minutes);
+      this.set('value', hours + ':' + minutes + ':00');
     }
   }
 
-  _formatHours() {
+  _formatHour() {
     if (isNaN(Number(this.hoursInput)) || Number(this.hoursInput) < 1 || Number(this.hoursInput) > 23) {
-      this.set('hoursInput', undefined);
-    }else {
+      if (this.autoValidate) {
+        this.set('invalid', true);
+      }
+    } else {
       this.hoursInput = this.hoursInput.length < 2 ? '0' + this.hoursInput : this.hoursInput;
     }
   }
 
   _formatMinutes() {
-    if (isNaN(Number(this.minutesInput)) || Number(this.minutesInput) < 1 || Number(this.minutesInput) > 59) {
-      this.set('minutesInput', undefined);
-    }else {
+    if (isNaN(Number(this.minutesInput)) || Number(this.minutesInput) < 0 || Number(this.minutesInput) > 59) {
+      if (this.autoValidate) {
+        this.set('invalid', true);
+      }
+    } else {
       this.minutesInput = this.minutesInput.length < 2 ? '0' + this.minutesInput : this.minutesInput;
     }
   }
 
   _isValidHours() {
-    return isNaN(this.hoursInput) || this.hoursInput < 1 || this.hoursInput > 23;
+    return Number(this.hoursInput) >= 0 && Number(this.hoursInput) < 24;
   }
 
   _isValidMinutes() {
-    return isNaN(this.minutesInput) || this.minutesInput < 1 || this.minutesInput > 59;
+    return Number(this.minutesInput) >= 0 && Number(this.minutesInput) < 60;
   }
 
   _clearData() {
@@ -165,11 +190,11 @@ class TimePickerLite extends PolymerElement {
   }
 
   validate() {
-    this.set('invalid', this._isValidHours() || this._isValidMinutes());
-    return this._isValidHours() || this._isValidMinutes();
+    const valid = this._isValidHours() && this._isValidMinutes();
+    this.set('invalid', !valid);
+    return valid;
   }
 
 }
 
-
-window.customElements.define('timepicker-lite', TimePickerLite);
+window.customElements.define('time-input', TimeInput);

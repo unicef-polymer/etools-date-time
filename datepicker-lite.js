@@ -1,16 +1,69 @@
 'use strict';
 import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
+import {GestureEventListeners} from '@polymer/polymer/lib/mixins/gesture-event-listeners.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/iron-icons/iron-icons.js';
+import '@polymer/paper-button/paper-button.js';
 
 import './calendar-lite.js';
+
+const moment = window.moment;
+if (!moment) {
+  throw new Error('DatepickerLite: momentjs is not loaded');
+}
+
+
+var openedDatepickerLiteElems = window.openedDatepickerLiteElems || [];
+var openedDatepickerLiteElemsCloseTimeout = window.openedDatepickerLiteElemsCloseTimeout || null;
+
+const _closeDatepickers = (keepOpenDatepicker) => {
+  openedDatepickerLiteElems.forEach((datePicker) => {
+    if (datePicker.calendar.opened && keepOpenDatepicker !== datePicker.calendar) {
+      datePicker.calendar.set('opened', false);
+    }
+  });
+
+  openedDatepickerLiteElems = (keepOpenDatepicker && keepOpenDatepicker.opened)
+      ? [{keepOpen: false, calendar: keepOpenDatepicker}]
+      : [];
+};
+
+const _getClickedDatepicker = (e) => {
+  let clickedDatepicker = (e.target.tagName.toLowerCase() === 'datepicker-lite')
+      ? e.target
+      : e.target.closest('datepicker-lite');
+  if (!clickedDatepicker) {
+    const openedDatepikerMap = openedDatepickerLiteElems.find(d => d.keepOpen === true);
+    if (openedDatepikerMap && openedDatepikerMap.keepOpen) {
+      clickedDatepicker = openedDatepikerMap.calendar;
+    }
+  }
+  return clickedDatepicker;
+};
+
+const _handleDatepickerLiteCloseOnClickOrTap = (e) => {
+  if (openedDatepickerLiteElems.length === 0 || openedDatepickerLiteElemsCloseTimeout !== null) {
+    return;
+  }
+  // timeout is used for debouncing Event and MouseEvent
+  openedDatepickerLiteElemsCloseTimeout = setTimeout(() => {
+    const clickedDatepicker = _getClickedDatepicker(e);
+    openedDatepickerLiteElemsCloseTimeout = null;
+    if (!(openedDatepickerLiteElems.length === 1 && openedDatepickerLiteElems[0] === clickedDatepicker)) {
+      _closeDatepickers(clickedDatepicker);
+    }
+  }, 10);
+};
+
+document.addEventListener('tap', _handleDatepickerLiteCloseOnClickOrTap);
+document.addEventListener('click', _handleDatepickerLiteCloseOnClickOrTap);
 
 /**
  * @customElement
  * @polymer
+ * @appliesMixin GestureEventListeners
  */
-class DatePickerLite extends PolymerElement {
+class DatePickerLite extends GestureEventListeners(PolymerElement) {
   static get template() {
     // language=HTML
     return html`
@@ -20,10 +73,6 @@ class DatePickerLite extends PolymerElement {
           display: block;
         }
 
-        paper-dropdown-menu {
-          width: 100%;
-        }
-
         .paper-input-input input {
           font-size: inherit;
           border: 0;
@@ -31,21 +80,38 @@ class DatePickerLite extends PolymerElement {
         }
 
         iron-icon {
-          margin-right: 8px;
+          @apply --layout;
           cursor: pointer;
-          @apply --datepicker-lite-icon
+        }
+
+        iron-icon[slot="prefix"] {
+          margin-right: 8px;
+        }
+
+        iron-icon[slot="suffix"] {
+          margin-left: 8px;
+          width: 14px;
+          height: 14px;
+        }
+
+        iron-icon[readonly] {
+          cursor: default;
+        }
+
+        .clear-btn,
+        .close-btn {
+          margin: 10px;
         }
 
         .clear-btn {
-          background: var(--my-elem-primary);
+          background: var(--datepiker-lite-clear-btn-bg, #ff4747);
           color: #fff;
           padding: 6px;
-          margin: 10px 0 10px 10px;
+
         }
 
         .close-btn {
           padding: 6px;
-          margin: 10px 0 10px 10px;
         }
 
         .monthInput {
@@ -60,6 +126,15 @@ class DatePickerLite extends PolymerElement {
           width: 40px;
         }
 
+        #calendar {
+          margin-top: -10px;
+        }
+
+        .actions {
+          display: flex;
+          justify-content: flex-end;
+        }
+
         /***************** this is used to remove arrows from inputs *****************************/
 
         input[type=number]::-webkit-inner-spin-button,
@@ -71,35 +146,66 @@ class DatePickerLite extends PolymerElement {
         *[hidden] {
           display: none;
         }
+        input[type=number] {
+          background-color: transparent;
+          -moz-appearance: textfield;
+        }
+
+        calendar-lite {
+            z-index: 130;
+        }
       </style>
 
       <paper-input-container always-float-label
                              disabled$="[[disabled]]"
                              required$="[[required]]"
-                             invalid="{{invalid}}"
-                             error-message="Invalid date.">
+                             invalid="{{invalid}}">
         <label hidden$=[[!label]] slot="label">[[label]]</label>
+
+        <iron-icon on-keypress="_toggelOnKeyPress" readonly$="[[readonly]]" icon="date-range" title="Toggle calendar" tabindex="1"
+                   on-tap="toggleCalendar" slot="prefix"></iron-icon>
+
         <div slot="input" class="paper-input-input">
-          <span>
-            <iron-icon on-keypress="keyCalendar" icon="date-range" alt="toggle" title="toggle" tabindex="1"
-                    on-tap="toggleCalendar"></iron-icon>
-          </span>
-          <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number" min="1" max="31">/
-          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm" type="number" min="1" max="12">/
-          <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy" type="number" min="1" max="9999">
+
+          <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number"
+                 min="1" max="31" on-blur="_handleOnBlur">/
+          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm"
+                 type="number" min="1" max="12" on-blur="_handleOnBlur">/
+          <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy"
+                 type="number" min="1" max="9999" on-blur="_handleOnBlur">
+
         </div>
+
+        <template is="dom-if" if="[[!readonly]]">
+          <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear" tabindex="1"
+                     hidden$="[[clearBtnInsideDr]]"></iron-icon>
+        </template>
+
+
+        <template is="dom-if" if="[[errorMessage]]">
+          <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
+        </template>
       </paper-input-container>
 
-      <calendar-lite id="calendar" on-date-change="datePicked" date="[[inputDate]]" hidden$="[[!opened]]">
-        <div slot="actions">
-          <paper-button raised class="clear-btn" on-tap="_clearData">Clear</paper-button>
-          <paper-button raised class="close-btn" on-tap="toggleCalendar">Close</paper-button>
+      <calendar-lite id="calendar" on-date-change="datePicked" date="[[inputDate]]" min-date="[[minDate]]"
+                     max-date="[[maxDate]]" hidden$="[[!opened]]">
+        <div class="actions" slot="actions">
+          <template is="dom-if" if="[[!readonly]]">
+            <paper-button raised class="clear-btn" on-tap="_clearData" hidden$="[[!clearBtnInsideDr]]">Clear
+            </paper-button>
+          </template>
+
+          <template is="dom-if" if="[[!closeOnSelect]]">
+            <paper-button raised class="close-btn" on-tap="toggleCalendar">Close</paper-button>
+          </template>
+
         </div>
       </calendar-lite>
 
     `;
   }
 
+  // language=JS
   static get properties() {
     return {
       value: {
@@ -110,17 +216,21 @@ class DatePickerLite extends PolymerElement {
       readonly: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       required: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
+      },
+      errorMessage: {
+        type: String,
+        value: 'Invalid date'
       },
       disabled: {
         type: Boolean,
         value: false,
-        reflectToAttribute: true,
+        reflectToAttribute: true
       },
       label: String,
       monthInput: {
@@ -144,8 +254,38 @@ class DatePickerLite extends PolymerElement {
         type: Boolean,
         value: false
       },
+      clearBtnInsideDr: {
+        type: Boolean,
+        value: false
+      },
+      closeOnSelect: {
+        type: Boolean,
+        value: false
+      },
       _clearDateInProgress: Boolean,
-      _stopDateCompute: Boolean
+      _stopDateCompute: Boolean,
+      autoValidate: {
+        type: Boolean,
+        value: false
+      },
+      minDate: Date,
+      maxDate: Date,
+      fireDateHasChanged: {
+        type: Boolean,
+        value: false
+      },
+      minDateErrorMsg: {
+        type: String,
+        value: 'Date is earlier than min date'
+      },
+      maxDateErrorMsg: {
+        type: String,
+        value: 'Date exceeds max date'
+      },
+      requiredErrorMsg: {
+        type: String
+      }
+
     };
   }
 
@@ -153,6 +293,21 @@ class DatePickerLite extends PolymerElement {
     return [
       'computeDate(monthInput, dayInput, yearInput)'
     ];
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener('tap', () => {
+      if (openedDatepickerLiteElems.length === 0) {
+        return;
+      }
+      for (let i = 0; i < openedDatepickerLiteElems.length; i++) {
+        if (openedDatepickerLiteElems[i].calendar === this && this.opened) {
+          openedDatepickerLiteElems[i].keepOpen = true;
+          break;
+        }
+      }
+    });
   }
 
   _getDateString(date) {
@@ -184,34 +339,58 @@ class DatePickerLite extends PolymerElement {
     this.set('dayInput', day);
     this.set('yearInput', year);
     this.value = this._getDateString(date);
+    if (this.fireDateHasChanged) {
+      this.dispatchEvent(new CustomEvent('date-has-changed', {
+        detail: {date: date},
+        bubbles: true,
+        composed: true
+      }));
+    }
+    if (this.closeOnSelect) {
+      _closeDatepickers();
+    }
     this._stopDateCompute = false;
   }
 
   computeDate(month, day, year) {
-    if (this._stopDateCompute) {
-      // prevent setting wrong value when year/month/day are set by datepiker in datePicked
-      return;
+    if (this.autoValidate) {
+      // this.set('_stopDateCompute', false);
+      this.set('invalid', !this._isValidYear() || !this._isValidMonth() || !this._isValidDay());
     }
 
-    if (this._isValidYear() && this._isValidMonth() &&
-        this._isValidDay() && this._enteredDateIsValid() ) {
-      let newDate = new Date(year, month - 1, day);
-      this.set('inputDate', newDate);
-      this.set('value', year + '-' + month + '-' + day);
+    if (month !== undefined && day !== undefined && year !== undefined) {
+      if (this._stopDateCompute) {
+        // prevent setting wrong value when year/month/day are set by datepiker in datePicked
+        return;
+      }
+
+      if (this._isValidYear() && this._isValidMonth() &&
+          this._isValidDay() && this._enteredDateIsValid()) {
+        let newDate = new Date(year, month - 1, day);
+        this.set('inputDate', newDate);
+        this.set('value', year + '-' + month + '-' + day);
+      }
     }
   }
 
   toggleCalendar() {
     if (!this.readonly) {
       this.set('opened', !this.opened);
-    }
 
+      if (openedDatepickerLiteElems.length > 0) {
+        _closeDatepickers();
+      }
+
+      if (this.opened) {
+        openedDatepickerLiteElems.push({keepOpen: true, calendar: this});
+      }
+    }
   }
 
-  keyCalendar(event){
+  _toggelOnKeyPress(event) {
     if (!this.readonly) {
-      if (event.which === 13 || event.button === 0){
-        this.set('opened', !this.opened);
+      if (event.which === 13 || event.button === 0) {
+        this.toggleCalendar();
       }
     }
   }
@@ -223,7 +402,11 @@ class DatePickerLite extends PolymerElement {
     this.set('dayInput', undefined);
     this.set('yearInput', undefined);
     this.set('value', null);
-    this.set('invalid', false);
+    if (this.autoValidate) {
+      this.validate();
+    } else {
+      this.set('invalid', false);
+    }
   }
 
   _isValidYear() {
@@ -249,41 +432,60 @@ class DatePickerLite extends PolymerElement {
     let newMonth = newDate.getMonth() + 1;
     let newDay = newDate.getDate();
 
-    return newMonth === Number(this.monthInput) &&
+    let valid = newMonth === Number(this.monthInput) &&
         newDay === Number(this.dayInput) &&
         newYear === Number(this.yearInput);
+    if (!valid) {
+      this.errorMessage = 'Invalid date';
+    }
+    return valid;
   }
-
 
   validate() {
     let valid = true;
 
-    if ((this._isValidMonth() && this._isValidDay() && this._isValidYear()) && this.required) {
+    valid = this.requiredValidation() && this.maxDateValidation()
+            && this.minDateValidation();
+
+    if (valid) {
       valid = this._enteredDateIsValid();
-      this.set('invalid', !this._enteredDateIsValid());
-      return valid;
-
-    } else if (!this.required) {
-      if (this.monthInput !== undefined || this.dayInput !== undefined || this.yearInput !== undefined) {
-        if (this._isValidMonth() && this._isValidDay() && this._isValidYear()) {
-          valid = this._enteredDateIsValid();
-          this.set('invalid', false);
-          return valid;
-
-        }else {
-          this.set('invalid', true);
-          valid = this._enteredDateIsValid();
-          return valid;
-        }
-      }
-
-      valid = this._enteredDateIsValid();
-      this.set('invalid', false);
-      return valid;
     }
 
-    this.set('invalid', true);
+    this.set('invalid', !valid);
     return valid;
+  }
+
+  maxDateValidation() {
+    if (this.maxDate) {
+      let valid = moment(this.value, 'YYYY-MM-DD') <= this.maxDate;
+      if (!valid) {
+        this.errorMessage = this.maxDateErrorMsg;
+      }
+      return valid;
+    }
+    return true;
+  }
+
+  minDateValidation() {
+    if (this.minDate) {
+      let valid = moment(this.value, 'YYYY-MM-DD') >= this.minDate;
+      if (!valid) {
+        this.errorMessage = this.minDateErrorMsg;
+      }
+      return valid;
+    }
+    return true;
+  }
+
+  requiredValidation() {
+    if (this.required) {
+      let valid = this._isValidMonth() && this._isValidDay() && this._isValidYear() && this._enteredDateIsValid();
+      if (!valid) {
+        this.errorMessage = this.requiredErrorMsg ? this.requiredErrorMsg : (this.maxDate ? 'This field is required' : this.errorMessage);
+      }
+      return valid;
+    }
+    return true;
   }
 
   _valueChanged(newValue) {
@@ -293,16 +495,26 @@ class DatePickerLite extends PolymerElement {
       }
       return;
     }
-    this._stopDateCompute = true;
     const dData = newValue.split('-');
+    if (dData.length !== 3) {
+      // value need to be yyyy-mm-dd format
+      return;
+    }
+    this._stopDateCompute = true;
     this.set('monthInput', dData[1]);
-    this.set('dayInput', dData[2]);
+    this.set('dayInput', dData[2].slice(0,2));
     this.set('yearInput', dData[0]);
     this._stopDateCompute = false;
 
-    const d = new Date(newValue);
+    const d = new Date(dData[0], Number(dData[1]) - 1, dData[2]);
     if (d.toString() !== 'Invalid Date') {
       this.set('inputDate', d);
+    }
+  }
+
+  _handleOnBlur() {
+    if (this.autoValidate) {
+      this.validate();
     }
   }
 

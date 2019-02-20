@@ -13,9 +13,31 @@
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.3.1/web-animations.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.3.1/web-animations-next-lite.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.0.2/webcomponents-loader.js"></script>
+
+    <script src="./node_modules/moment/min/moment.min.js"></script>
+
     <script type="module" src="./calendar-lite.js"></script>
     <script type="module" src="./datepicker-lite.js"></script>
-    <script type="module" src="./time-picker-lite.js"></script>
+    <script type="module" src="time-input.js"></script>
+    <script type="module" src="./node_modules/@polymer/paper-input/paper-input.js"></script>
+
+    <style type="text/css">
+      .datepickers,
+      .time-inputs {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+      }
+      .datepickers > div,
+      .time-inputs > div {
+        width: 350px;
+      }
+
+      datepicker-lite,
+      time-input {
+        width: 200px;
+      }
+    </style>
 
   </head>
   <body>
@@ -25,14 +47,24 @@
    <!--<calendar-lite id="excalendar" min-date="2016,12,9" multi-select='{"max":3,"consequent":false}'  disabled-week-day='["Fri"]'  disabled-days="[2,3,4]">-->
    <!--</calendar-lite>-->
 
-    <div style="width: 400px">
-      <datepicker-lite required$ label="Paper datepicker" ></datepicker-lite>
+    <div class="datepickers">
+      <div>
+        <datepicker-lite required label="Datepicker" value="2018-08-30"></datepicker-lite>
+      </div>
+
+      <div>
+        <datepicker-lite required auto-validate label="Datepicker"></datepicker-lite>
+      </div>
+
+      <div>
+        <datepicker-lite required label="Datepicker" clear-btn-inside-dr auto-validate></datepicker-lite>
+      </div>
+
     </div>
 
-   <div style="width: 400px">
-     <timepicker-lite label="Time picker">
-
-     </timepicker-lite>
+   <div class="time-inputs">
+     <div><time-input></time-input></div>
+     <div><time-input auto-validate required></time-input></div>
    </div>
   <script>
 

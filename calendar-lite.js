@@ -6,6 +6,11 @@ import '@polymer/iron-iconset-svg/iron-iconset-svg.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-styles/element-styles/paper-material-styles.js';
 
+const moment = window.moment;
+if (!moment) {
+  throw new Error('CalendarLite: momentjs is not loaded');
+}
+
 class CalendarLite extends GestureEventListeners(PolymerElement) {
   static get template() {
     // language=HTML
@@ -284,7 +289,6 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
 
       </style>
 
-
       <!-- Main header date,month,year are compund binded to selected date -->
 
       <div class="paper-material card" elevation="1">
@@ -294,8 +298,8 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
           </div>
           <div class="monthContainer notextselect">
             <span type='calendarContent' on-tap="_show" class="menu_item">{{_getUpdated(date,'day')}}</span>, <span
-                  class='menu_item' type='monthsList' on-tap="_show">{{_getUpdated(date,'month')}}</span> <span
-                  class='menu_item' type='calendarContent' on-tap="_show">{{_getUpdated(date,'date')}}</span>
+              class='menu_item' type='monthsList' on-tap="_show">{{_getUpdated(date,'month')}}</span> <span
+              class='menu_item' type='calendarContent' on-tap="_show">{{_getUpdated(date,'date')}}</span>
           </div>
         </div>
 
@@ -374,8 +378,6 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
 
         </div>
       </div>
-
-
     `;
   }
 
@@ -399,11 +401,13 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       },
       minDate: {
         type: Date,
-        value: null
+        value: null,
+        observer: 'changeView'
       },
       maxDate: {
         type: Date,
-        value: null
+        value: null,
+        observer: 'changeView'
       },
       disabledDays: {
         type: Array,
@@ -430,8 +434,17 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       disabledWeekDay: {
         type: Array,
         value: []
+      },
+      prettyDate: {
+        type: String,
+        notify: true,
+        observer: 'prettyDateChanged'
+      },
+      format: {
+        type: String,
+        value: 'YYYY-MM-DD'
       }
-    }
+    };
   }
 
   constructor() {
@@ -460,7 +473,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     this.generateTable();
     this._animationEvent = this._whichAnimationEnd();
 
-    this.multiple.push(this.date.getDate() + "," + this.date.getMonth() + "," + this.date.getFullYear());
+    this.multiple.push(this.date.getDate() + ',' + this.date.getMonth() + ',' + this.date.getFullYear());
 
     this.currentYear = this.date.getFullYear();
     this.currentMonth = this.date.getMonth();
@@ -474,9 +487,9 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     //push into years list
     var tmpArray = [];
     if (this.maxDate != null && this.minDate != null) {
-      this._generateYears((this.minDate).getFullYear(), (this.maxDate).getFullYear())
+      this._generateYears((this.minDate).getFullYear(), (this.maxDate).getFullYear());
     } else {
-      this._generateYears(this.currentYear - 101, this.currentYear + 30, tmpArray)
+      this._generateYears(this.currentYear - 101, this.currentYear + 30, tmpArray);
     }
     //discard tmpArray
     tmpArray = null;
@@ -489,7 +502,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       return this.months_names[this.date.getMonth()];
     }
     else if (type == 'day') {
-      return this.days_names[this.date.getDay()]
+      return this.days_names[this.date.getDay()];
     } else if (type == 'date') {
       return this.date.getDate();
     } else {
@@ -506,7 +519,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     this.cf = 0;
     //fill with empty cells
     for (var i = 0; i < this.tmpDate.getDay(); i++) {
-      tmpArray.push({text: "", isDisabled: false, i: this.cf++});
+      tmpArray.push({text: '', isDisabled: false, i: this.cf++});
     }
 
     //fill days and check disable dates
@@ -522,7 +535,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     //fill remaining empty cells
     this.cf = (tmpArray.length > 35) ? (42 - (tmpArray.length)) : (34 - (tmpArray.length));
     for (var j = 0; j <= this.cf; j++) {
-      tmpArray.push({text: ""});
+      tmpArray.push({text: ''});
     }
     this.days = tmpArray;
     tmpArray = null;
@@ -530,37 +543,37 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
 
   _getDayClass(s, d) {
     if (this.multiSelect != null) {
-      if (this.multiple.indexOf(s + "," + this.currentMonth + "," + this.currentYear) > -1) {
-        return "dateSticker  selected";
+      if (this.multiple.indexOf(s + ',' + this.currentMonth + ',' + this.currentYear) > -1) {
+        return 'dateSticker  selected';
       }
     }
     if (this.date.getDate() == s && this.date.getMonth() == this.currentMonth && this.date.getFullYear() == this.currentYear) {
-      return "dateSticker selected";
+      return 'dateSticker selected';
     }
-    return "dateSticker";
+    return 'dateSticker';
   }
 
   _setDate(e) {
     var target = e.target;
     var f = e.model.day;
-    if (f.text != "" && !e.model.day.isDisabled) {
+    if (f.text != '' && !e.model.day.isDisabled) {
 
       if (this.multiSelect != null) {
         if (this.multiSelect.consequent) {
           this.multiple = [];
           this.cf = f.i;
-          this.multiple.push(f.text + "," + this.currentMonth + "," + this.currentYear);
+          this.multiple.push(f.text + ',' + this.currentMonth + ',' + this.currentYear);
           for (var j = 1; this.multiple.length < (this.multiSelect.max); j++) {
             this.tmpDate = new Date(this.currentYear, this.currentMonth, f.text + j);
             if ((this.minDate != null && this.tmpDate <= this.minDate) || (this.maxDate != null && this.tmpDate >= this.maxDate) || this.disabledWeekDay.indexOf(this.days_names[(this.tmpDate).getDay()]) != -1 || (this.disabledDays).indexOf(this.tmpDate.getDate()) != -1) {
             } else {
-              this.multiple.push(this.tmpDate.getDate() + "," + this.tmpDate.getMonth() + "," + this.tmpDate.getFullYear());
+              this.multiple.push(this.tmpDate.getDate() + ',' + this.tmpDate.getMonth() + ',' + this.tmpDate.getFullYear());
             }
           }
         } else {
-          this.cf = this.multiple.indexOf(f.text + "," + this.currentMonth + "," + this.currentYear);
+          this.cf = this.multiple.indexOf(f.text + ',' + this.currentMonth + ',' + this.currentYear);
           if (this.cf < 0) {
-            this.multiple.push(f.text + "," + this.currentMonth + "," + this.currentYear);
+            this.multiple.push(f.text + ',' + this.currentMonth + ',' + this.currentYear);
           } else {
             target.classList.remove('selected');
             this.multiple.splice(this.cf, 1);
@@ -573,48 +586,25 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
         }
         this.triggerEvent('multiselect', this.multiple);
       }
+
       this.date = new Date(this.currentYear, this.currentMonth, f.text);
+      this.prettyDate = moment(this.date).format(this.format);
     }
   }
 
-  _keyPressSelect(e) {
-    if (e.which === 13){
-      this._setDate(e);
+  prettyDateChanged(newPrettyDate) {
+    if (this.date && moment(this.date).format(this.format) === newPrettyDate) {
       return;
-      var target = e.target;
-      var f = e.model.day;
-      if (f.text != "" && !e.model.day.isDisabled) {
+    }
+    if (!newPrettyDate) {
+      return;
+    }
+    this.date = moment(newPrettyDate, this.format).toDate();
+  }
 
-        if (this.multiSelect != null) {
-          if (this.multiSelect.consequent) {
-            this.multiple = [];
-            this.cf = f.i;
-            this.multiple.push(f.text + "," + this.currentMonth + "," + this.currentYear);
-            for (var j = 1; this.multiple.length < (this.multiSelect.max); j++) {
-              this.tmpDate = new Date(this.currentYear, this.currentMonth, f.text + j);
-              if ((this.minDate != null && this.tmpDate <= this.minDate) || (this.maxDate != null && this.tmpDate >= this.maxDate) || this.disabledWeekDay.indexOf(this.days_names[(this.tmpDate).getDay()]) != -1 || (this.disabledDays).indexOf(this.tmpDate.getDate()) != -1) {
-              } else {
-                this.multiple.push(this.tmpDate.getDate() + "," + this.tmpDate.getMonth() + "," + this.tmpDate.getFullYear());
-              }
-            }
-          } else {
-            this.cf = this.multiple.indexOf(f.text + "," + this.currentMonth + "," + this.currentYear);
-            if (this.cf < 0) {
-              this.multiple.push(f.text + "," + this.currentMonth + "," + this.currentYear);
-            } else {
-              target.classList.remove('selected');
-              this.multiple.splice(this.cf, 1);
-              this.triggerEvent('multiselect', this.multiple);
-              return;
-            }
-            if (this.multiple.length > this.multiSelect.max) {
-              this.multiple.shift();
-            }
-          }
-          this.triggerEvent('multiselect', this.multiple);
-        }
-        this.date = new Date(this.currentYear, this.currentMonth, f.text);
-      }
+  _keyPressSelect(e) {
+    if (e.which === 13) {
+      this._setDate(e);
     }
   }
 
@@ -653,7 +643,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     this.tmpObject.style.display = 'block';
     this.tmpObject.classList.add('scale-up');
     this._once(this._animationEvent, () => {
-      (this.tmpObject).classList.remove('scale-up')
+      (this.tmpObject).classList.remove('scale-up');
     }, this.tmpObject);
 
     pages = null;
@@ -681,12 +671,12 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
 
   dateFormat(date) {
     if (this.date) {
-      return (this.days_names[(this.date).getDay()])
+      return (this.days_names[(this.date).getDay()]);
     }
   }
 
   monthFormat() {
-    return this.months_names[this.currentMonth]
+    return this.months_names[this.currentMonth];
   }
 
   yearFormat() {
@@ -696,14 +686,14 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
   _swipeNextMonth() {
     this.$.mainContent.classList.add('slide-right');
     this._once(this._animationEvent, () => {
-      this.$.mainContent.classList.remove('slide-right')
+      this.$.mainContent.classList.remove('slide-right');
     }, this.$.mainContent);
     this.changeView(1);
   }
 
   changeView(x) {
     var tmp = new Date(this.currentYear, this.currentMonth, 1);
-    tmp.setMonth(this.currentMonth + x);
+    tmp.setMonth(this.currentMonth + (typeof x === 'number' ? x : 0));
     this.currentMonth = tmp.getMonth();
     this.currentYear = tmp.getFullYear();
     this.dispatchEvent(new CustomEvent('month-change', {detail: {date: this.tmpDate}}));
@@ -723,13 +713,13 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
   _swipePrevMonth() {
     this.$.mainContent.classList.add('slide-left');
     this._once(this._animationEvent, () => {
-      this.$.mainContent.classList.remove('slide-left')
+      this.$.mainContent.classList.remove('slide-left');
     }, this.$.mainContent);
     this.changeView(-1);
   }
 
   _getDays(row) {
-    return ((this.days).slice(row * 7, (row * 7) + 7))
+    return ((this.days).slice(row * 7, (row * 7) + 7));
   }
 
   _whichAnimationEnd() {
