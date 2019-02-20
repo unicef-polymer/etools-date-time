@@ -7,6 +7,12 @@ import '@polymer/paper-button/paper-button.js';
 
 import './calendar-lite.js';
 
+const moment = window.moment;
+if (!moment) {
+  throw new Error('DatepickerLite: momentjs is not loaded');
+}
+
+
 var openedDatepickerLiteElems = window.openedDatepickerLiteElems || [];
 var openedDatepickerLiteElemsCloseTimeout = window.openedDatepickerLiteElemsCloseTimeout || null;
 
@@ -144,7 +150,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           background-color: transparent;
           -moz-appearance: textfield;
         }
-        
+
         calendar-lite {
             z-index: 130;
         }
@@ -451,7 +457,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
   maxDateValidation() {
     if (this.maxDate) {
-      let valid = this.value <= this.maxDate;
+      let valid = moment(this.value, 'YYYY-MM-DD') <= this.maxDate;
       if (!valid) {
         this.errorMessage = this.maxDateErrorMsg;
       }
@@ -462,7 +468,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
   minDateValidation() {
     if (this.minDate) {
-      let valid = this.value >= this.minDate;
+      let valid = moment(this.value, 'YYYY-MM-DD') >= this.minDate;
       if (!valid) {
         this.errorMessage = this.minDateErrorMsg;
       }
