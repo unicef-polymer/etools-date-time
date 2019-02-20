@@ -33,6 +33,11 @@ class TimeInput extends PolymerElement {
           margin: 0;
         }
 
+        input[type=number] {
+          background-color: transparent;
+          -moz-appearance: textfield;
+        }
+
         iron-icon {
           @apply --layout;
           margin-right: 8px;

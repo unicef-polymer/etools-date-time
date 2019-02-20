@@ -141,7 +141,8 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           display: none;
         }
         input[type=number] {
-          background-color: initial;
+          background-color: transparent;
+          -moz-appearance: textfield;
         }
         
         calendar-lite {
