@@ -7,6 +7,12 @@ import '@polymer/paper-button/paper-button.js';
 
 import './calendar-lite.js';
 
+const moment = window.moment;
+if (!moment) {
+  throw new Error('DatepickerLite: momentjs is not loaded');
+}
+
+
 var openedDatepickerLiteElems = window.openedDatepickerLiteElems || [];
 var openedDatepickerLiteElemsCloseTimeout = window.openedDatepickerLiteElemsCloseTimeout || null;
 
@@ -140,6 +146,14 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         *[hidden] {
           display: none;
         }
+        input[type=number] {
+          background-color: transparent;
+          -moz-appearance: textfield;
+        }
+
+        calendar-lite {
+            z-index: 130;
+        }
       </style>
 
       <paper-input-container always-float-label
@@ -166,7 +180,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear" tabindex="1"
                      hidden$="[[clearBtnInsideDr]]"></iron-icon>
         </template>
-        
+
 
         <template is="dom-if" if="[[errorMessage]]">
           <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
@@ -184,7 +198,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           <template is="dom-if" if="[[!closeOnSelect]]">
             <paper-button raised class="close-btn" on-tap="toggleCalendar">Close</paper-button>
           </template>
-          
+
         </div>
       </calendar-lite>
 
@@ -255,7 +269,23 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         value: false
       },
       minDate: Date,
-      maxDate: Date
+      maxDate: Date,
+      fireDateHasChanged: {
+        type: Boolean,
+        value: false
+      },
+      minDateErrorMsg: {
+        type: String,
+        value: 'Date is earlier than min date'
+      },
+      maxDateErrorMsg: {
+        type: String,
+        value: 'Date exceeds max date'
+      },
+      requiredErrorMsg: {
+        type: String
+      }
+
     };
   }
 
@@ -309,6 +339,13 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     this.set('dayInput', day);
     this.set('yearInput', year);
     this.value = this._getDateString(date);
+    if (this.fireDateHasChanged) {
+      this.dispatchEvent(new CustomEvent('date-has-changed', {
+        detail: {date: date},
+        bubbles: true,
+        composed: true
+      }));
+    }
     if (this.closeOnSelect) {
       _closeDatepickers();
     }
@@ -395,21 +432,60 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     let newMonth = newDate.getMonth() + 1;
     let newDay = newDate.getDate();
 
-    return newMonth === Number(this.monthInput) &&
+    let valid = newMonth === Number(this.monthInput) &&
         newDay === Number(this.dayInput) &&
         newYear === Number(this.yearInput);
+    if (!valid) {
+      this.errorMessage = 'Invalid date';
+    }
+    return valid;
   }
 
   validate() {
     let valid = true;
 
-    if (this.required) {
-      valid = this._isValidMonth() && this._isValidDay() && this._isValidYear() && this._enteredDateIsValid();
-    } else {
+    valid = this.requiredValidation() && this.maxDateValidation()
+            && this.minDateValidation();
+
+    if (valid) {
       valid = this._enteredDateIsValid();
     }
+
     this.set('invalid', !valid);
     return valid;
+  }
+
+  maxDateValidation() {
+    if (this.maxDate) {
+      let valid = moment(this.value, 'YYYY-MM-DD') <= this.maxDate;
+      if (!valid) {
+        this.errorMessage = this.maxDateErrorMsg;
+      }
+      return valid;
+    }
+    return true;
+  }
+
+  minDateValidation() {
+    if (this.minDate) {
+      let valid = moment(this.value, 'YYYY-MM-DD') >= this.minDate;
+      if (!valid) {
+        this.errorMessage = this.minDateErrorMsg;
+      }
+      return valid;
+    }
+    return true;
+  }
+
+  requiredValidation() {
+    if (this.required) {
+      let valid = this._isValidMonth() && this._isValidDay() && this._isValidYear() && this._enteredDateIsValid();
+      if (!valid) {
+        this.errorMessage = this.requiredErrorMsg ? this.requiredErrorMsg : (this.maxDate ? 'This field is required' : this.errorMessage);
+      }
+      return valid;
+    }
+    return true;
   }
 
   _valueChanged(newValue) {

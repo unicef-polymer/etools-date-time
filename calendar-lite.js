@@ -6,6 +6,11 @@ import '@polymer/iron-iconset-svg/iron-iconset-svg.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-styles/element-styles/paper-material-styles.js';
 
+const moment = window.moment;
+if (!moment) {
+  throw new Error('CalendarLite: momentjs is not loaded');
+}
+
 class CalendarLite extends GestureEventListeners(PolymerElement) {
   static get template() {
     // language=HTML
@@ -283,7 +288,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
         }
 
       </style>
-      
+
       <!-- Main header date,month,year are compund binded to selected date -->
 
       <div class="paper-material card" elevation="1">
@@ -429,6 +434,15 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       disabledWeekDay: {
         type: Array,
         value: []
+      },
+      prettyDate: {
+        type: String,
+        notify: true,
+        observer: 'prettyDateChanged'
+      },
+      format: {
+        type: String,
+        value: 'YYYY-MM-DD'
       }
     };
   }
@@ -572,8 +586,20 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
         }
         this.triggerEvent('multiselect', this.multiple);
       }
+
       this.date = new Date(this.currentYear, this.currentMonth, f.text);
+      this.prettyDate = moment(this.date).format(this.format);
     }
+  }
+
+  prettyDateChanged(newPrettyDate) {
+    if (this.date && moment(this.date).format(this.format) === newPrettyDate) {
+      return;
+    }
+    if (!newPrettyDate) {
+      return;
+    }
+    this.date = moment(newPrettyDate, this.format).toDate();
   }
 
   _keyPressSelect(e) {
