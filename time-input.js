@@ -44,6 +44,10 @@ class TimeInput extends PolymerElement {
           @apply --etools-time-icon
         }
 
+        iron-icon[slot="prefix"] {
+            color: var(--medium-icon-color, #9D9D9D);
+        }
+
         *[hidden] {
           display: none;
         }
