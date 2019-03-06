@@ -456,27 +456,23 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
   }
 
   maxDateValidation() {
-    if (this.maxDate) {
-      if (this.value && this.value !== undefined) {
-        let valid = moment(this.value, 'YYYY-MM-DD') <= this.maxDate;
-        if (!valid) {
-          this.errorMessage = this.maxDateErrorMsg;
-        }
-        return valid;
+    if (this.maxDate && this.value) {
+      let valid = moment(this.value, 'YYYY-MM-DD') <= this.maxDate;
+      if (!valid) {
+        this.errorMessage = this.maxDateErrorMsg;
       }
+      return valid;
     }
     return true;
   }
 
   minDateValidation() {
-    if (this.minDate) {
-      if (this.value && this.value !== undefined) {
-        let valid = moment(this.value, 'YYYY-MM-DD') >= this.minDate;
-        if (!valid) {
-          this.errorMessage = this.minDateErrorMsg;
-        }
-        return valid;
+    if (this.minDate && this.value) {
+      let valid = moment(this.value, 'YYYY-MM-DD') >= this.minDate;
+      if (!valid) {
+        this.errorMessage = this.minDateErrorMsg;
       }
+      return valid;
     }
     return true;
   }
