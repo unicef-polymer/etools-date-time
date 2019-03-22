@@ -321,6 +321,16 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     return [year, month, day].join('-');
   }
 
+  _triggerDateChangeCustomEvent(date) {
+    if (this.fireDateHasChanged) {
+      this.dispatchEvent(new CustomEvent('date-has-changed', {
+        detail: {date: date},
+        bubbles: true,
+        composed: true
+      }));
+    }
+  }
+
   datePicked(event) {
     if (this._clearDateInProgress) {
       this._clearDateInProgress = false;
@@ -339,13 +349,9 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     this.set('dayInput', day);
     this.set('yearInput', year);
     this.value = this._getDateString(date);
-    if (this.fireDateHasChanged) {
-      this.dispatchEvent(new CustomEvent('date-has-changed', {
-        detail: {date: date},
-        bubbles: true,
-        composed: true
-      }));
-    }
+
+    this._triggerDateChangeCustomEvent(date);
+
     if (this.closeOnSelect) {
       _closeDatepickers();
     }
@@ -407,6 +413,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     } else {
       this.set('invalid', false);
     }
+    this._triggerDateChangeCustomEvent(this.value);
   }
 
   _isValidYear() {
@@ -456,7 +463,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
   }
 
   maxDateValidation() {
-    if (this.maxDate) {
+    if (this.maxDate && this.value) {
       let valid = moment(this.value, 'YYYY-MM-DD') <= this.maxDate;
       if (!valid) {
         this.errorMessage = this.maxDateErrorMsg;
@@ -467,7 +474,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
   }
 
   minDateValidation() {
-    if (this.minDate) {
+    if (this.minDate && this.value) {
       let valid = moment(this.value, 'YYYY-MM-DD') >= this.minDate;
       if (!valid) {
         this.errorMessage = this.minDateErrorMsg;
