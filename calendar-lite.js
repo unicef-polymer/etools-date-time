@@ -297,9 +297,9 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
             {{_getUpdated(date,'year')}}
           </div>
           <div class="monthContainer notextselect">
-            <span type='calendarContent' on-tap="_show" class="menu_item">{{_getUpdated(date,'day')}}</span>, <span
-              class='menu_item' type='monthsList' on-tap="_show">{{_getUpdated(date,'month')}}</span> <span
-              class='menu_item' type='calendarContent' on-tap="_show">{{_getUpdated(date,'date')}}</span>
+            <span type='calendarContent' on-tap="_show" class="menu_item">{{_getUpdated(date,'day')}}</span><span hidden$=[[!_getUpdated(date,'day')]]>,</span>
+             <span class='menu_item' type='monthsList' on-tap="_show">{{_getUpdated(date,'month')}}</span>
+             <span class='menu_item' type='calendarContent' on-tap="_show">{{_getUpdated(date,'date')}}</span>
           </div>
         </div>
 
@@ -473,10 +473,10 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     this.generateTable();
     this._animationEvent = this._whichAnimationEnd();
 
-    this.multiple.push(this.date.getDate() + ',' + this.date.getMonth() + ',' + this.date.getFullYear());
+    this.multiple.push(this._getSelectedDay() + ',' + this._getSelectedMonth() + ',' + this._getSelectedYear());
 
-    this.currentYear = this.date.getFullYear();
-    this.currentMonth = this.date.getMonth();
+    this.currentYear = this._getSelectedYear();
+    this.currentMonth = this._getSelectedMonth();
 
     //update header color if set
     if (this.mainColor != null) {
@@ -495,16 +495,33 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     tmpArray = null;
   }
 
+  _getSelectedYear() {
+    return this.date ? this.date.getFullYear() : this._getCurrentDate().getFullYear();
+  }
+
+  _getSelectedMonth() {
+    return this.date ? this.date.getMonth() : this._getCurrentDate().getMonth();
+  }
+
+  _getSelectedDay() {
+    return this.date ? this.date.getDate() : null;
+  }
+
+
+  _getCurrentDate() {
+    return new Date();
+  }
+
   _getUpdated(d, type) {
     if (type == 'year') {
-      return this.date.getFullYear();
+      return this._getSelectedYear();
     } else if (type == 'month') {
-      return this.months_names[this.date.getMonth()];
+      return this.months_names[this._getSelectedMonth()];
     }
     else if (type == 'day') {
-      return this.days_names[this.date.getDay()];
+      return this.date ? this.days_names[this.date.getDay()] : '';
     } else if (type == 'date') {
-      return this.date.getDate();
+      return this.date ? this.date.getDate() :  null;
     } else {
       //some thing weird
     }
@@ -547,7 +564,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
         return 'dateSticker  selected';
       }
     }
-    if (this.date.getDate() == s && this.date.getMonth() == this.currentMonth && this.date.getFullYear() == this.currentYear) {
+    if (this._getSelectedDay() == s && this._getSelectedMonth() == this.currentMonth && this._getSelectedYear() == this.currentYear) {
       return 'dateSticker selected';
     }
     return 'dateSticker';
@@ -657,9 +674,9 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
   }
 
   _populate(newDate, oldDate) {
-    this.currentMonth = newDate.getMonth();
-    this.currentYear = newDate.getFullYear();
-    this.currentDay = newDate.getDay();
+    this.currentMonth = newDate ? newDate.getMonth() : this._getCurrentDate().getMonth();
+    this.currentYear = newDate ? newDate.getFullYear() : this._getCurrentDate().getFullYear();
+    this.currentDay = newDate ? newDate.getDay() : null;
     this.generateTable();
     this.separator = [0, 1, 2, 3, 4, 5];
     if (!oldDate) {
