@@ -362,6 +362,9 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     if (this.autoValidate) {
       // this.set('_stopDateCompute', false);
       this.set('invalid', !this._isValidYear() || !this._isValidMonth() || !this._isValidDay());
+      if (this.invalid) {
+        this.errorMessage = 'Invalid date';
+      }
     }
 
     if (month !== undefined && day !== undefined && year !== undefined) {
@@ -403,7 +406,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
   _clearData() {
     this._clearDateInProgress = true;
-    this.set('inputDate', new Date());
+    this.set('inputDate', null);
     this.set('monthInput', undefined);
     this.set('dayInput', undefined);
     this.set('yearInput', undefined);
@@ -433,6 +436,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
 
   _enteredDateIsValid() {
+
     let newDate = new Date(this.yearInput, this.monthInput - 1, this.dayInput);
 
     let newYear = newDate.getFullYear();
@@ -455,7 +459,9 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
             && this.minDateValidation();
 
     if (valid) {
-      valid = this._enteredDateIsValid();
+      if (this.yearInput || this.monthInput || this.dayInput) {
+        valid = this._enteredDateIsValid();
+      }
     }
 
     this.set('invalid', !valid);
