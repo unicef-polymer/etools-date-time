@@ -292,7 +292,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       <!-- Main header date,month,year are compund binded to selected date -->
 
       <div class="paper-material card" elevation="1">
-        <div class="mainHeader" style="">
+        <div class="mainHeader" style="" hidden$="[[hideHeader]]">
           <div class="yearContainer notextselect" type='yearList' on-tap="_show">
             {{_getHeaderYear(currentYear)}}
           </div>
@@ -442,6 +442,11 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       format: {
         type: String,
         value: 'YYYY-MM-DD'
+      },
+      hideHeader: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
       }
     };
   }
