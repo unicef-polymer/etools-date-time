@@ -514,7 +514,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
   }
 
   _showComma(currentDay, _currentMonth) {
-    return !!currentDay;
+    return !!currentDay || currentDay == 0;
   }
 
   _getCurrentDate() {
