@@ -292,14 +292,14 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       <!-- Main header date,month,year are compund binded to selected date -->
 
       <div class="paper-material card" elevation="1">
-        <div class="mainHeader" style="">
+        <div class="mainHeader" style="" hidden$="[[hideHeader]]">
           <div class="yearContainer notextselect" type='yearList' on-tap="_show">
-            {{_getUpdated(date,'year')}}
+            {{_getHeaderYear(currentYear, currentDay)}}
           </div>
           <div class="monthContainer notextselect">
-            <span type='calendarContent' on-tap="_show" class="menu_item">{{_getUpdated(date,'day')}}</span>, <span
-              class='menu_item' type='monthsList' on-tap="_show">{{_getUpdated(date,'month')}}</span> <span
-              class='menu_item' type='calendarContent' on-tap="_show">{{_getUpdated(date,'date')}}</span>
+            <span type='calendarContent' on-tap="_show" class="menu_item">{{_getUpdated(date,'day')}}</span><span hidden$="[[!_showComma(currentDay, currentMonth)]]">,</span>
+             <span class='menu_item' type='monthsList' on-tap="_show">{{_getHeaderMonth(currentMonth, currentDay)}}</span>
+             <span class='menu_item' type='calendarContent' on-tap="_show">{{_getUpdated(date,'date')}}</span>
           </div>
         </div>
 
@@ -390,7 +390,6 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       date: {
         type: Date,
         notify: true,
-        value: () => new Date(),
         observer: '_populate'
       },
       currentMonth: {
@@ -443,6 +442,11 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       format: {
         type: String,
         value: 'YYYY-MM-DD'
+      },
+      hideHeader: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
       }
     };
   }
@@ -470,13 +474,15 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     // generate 6 x 7 table
     super.ready(); // for 2.0 class-based elements only
 
-    this.generateTable();
+
     this._animationEvent = this._whichAnimationEnd();
 
-    this.multiple.push(this.date.getDate() + ',' + this.date.getMonth() + ',' + this.date.getFullYear());
+    this.multiple.push(this._getSelectedDay() + ',' + this._getSelectedMonth() + ',' + this._getSelectedYear());
 
-    this.currentYear = this.date.getFullYear();
-    this.currentMonth = this.date.getMonth();
+    this.currentYear = this._getSelectedYear();
+    this.currentMonth = this._getSelectedMonth();
+
+    this.generateTable();
 
     //update header color if set
     if (this.mainColor != null) {
@@ -495,16 +501,44 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     tmpArray = null;
   }
 
+  _getSelectedYear() {
+    return this.date ? this.date.getFullYear() : this._getCurrentDate().getFullYear();
+  }
+
+  _getSelectedMonth() {
+    return this.date ? this.date.getMonth() : this._getCurrentDate().getMonth();
+  }
+
+  _getSelectedDay() {
+    return this.date ? this.date.getDate() : null;
+  }
+
+  _showComma(currentDay, _currentMonth) {
+    return !!currentDay;
+  }
+
+  _getCurrentDate() {
+    return new Date();
+  }
+
+  _getHeaderMonth(currentMonth, _currentDay) {
+    return this._getUpdated(this.date, 'month');
+  }
+
+  _getHeaderYear(currentYear, _currentDay) {
+    return this._getUpdated(this.date, 'year');
+  }
+
   _getUpdated(d, type) {
     if (type == 'year') {
-      return this.date.getFullYear();
+      return this._getSelectedYear();
     } else if (type == 'month') {
-      return this.months_names[this.date.getMonth()];
+      return this.months_names[this._getSelectedMonth()];
     }
     else if (type == 'day') {
-      return this.days_names[this.date.getDay()];
+      return this.date ? this.days_names[this.date.getDay()] : '';
     } else if (type == 'date') {
-      return this.date.getDate();
+      return this.date ? this.date.getDate() :  null;
     } else {
       //some thing weird
     }
@@ -547,7 +581,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
         return 'dateSticker  selected';
       }
     }
-    if (this.date.getDate() == s && this.date.getMonth() == this.currentMonth && this.date.getFullYear() == this.currentYear) {
+    if (this._getSelectedDay() == s && this._getSelectedMonth() == this.currentMonth && this._getSelectedYear() == this.currentYear) {
       return 'dateSticker selected';
     }
     return 'dateSticker';
@@ -657,15 +691,12 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
   }
 
   _populate(newDate, oldDate) {
-    this.currentMonth = newDate.getMonth();
-    this.currentYear = newDate.getFullYear();
-    this.currentDay = newDate.getDay();
+    this.currentMonth = newDate ? newDate.getMonth() : this._getCurrentDate().getMonth();
+    this.currentYear = newDate ? newDate.getFullYear() : this._getCurrentDate().getFullYear();
+    this.currentDay = newDate ? newDate.getDay() : null;
     this.generateTable();
     this.separator = [0, 1, 2, 3, 4, 5];
-    if (!oldDate) {
-      // don't dispatch the date changed event if the element is just initialising
-      return;
-    }
+
     this.dispatchEvent(new CustomEvent('date-change', {detail: {date: newDate}}));
   }
 
