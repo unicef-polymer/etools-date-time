@@ -260,7 +260,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       },
       closeOnSelect: {
         type: Boolean,
-        value: false
+        value: true
       },
       _clearDateInProgress: Boolean,
       _stopDateCompute: Boolean,
