@@ -287,6 +287,9 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
           font-weight: bold;
         }
 
+		    .paper-material[elevation="1"]{
+          height: 100%;
+        }
       </style>
 
       <!-- Main header date,month,year are compund binded to selected date -->
