@@ -18,7 +18,7 @@ import {GestureEventListeners} from '@polymer/polymer/lib/mixins/gesture-event-l
 
 declare class DatePickerLite extends
   GestureEventListeners(
-  Object) {
+  PolymerElement) {
   value: string|null|undefined;
   readonly: boolean|null|undefined;
   required: boolean|null|undefined;
@@ -60,6 +60,8 @@ declare class DatePickerLite extends
   _valueChanged(newValue: any): void;
   _handleOnBlur(): void;
 }
+
+export default DatePickerLite;
 
 declare global {
 
