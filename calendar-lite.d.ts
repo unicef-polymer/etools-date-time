@@ -61,6 +61,8 @@ declare class CalendarLite {
   _whichAnimationEnd(): any;
 }
 
+export default CalendarLite;
+
 declare global {
 
   interface HTMLElementTagNameMap {
