@@ -287,7 +287,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
           font-weight: bold;
         }
 
-		    .paper-material[elevation="1"]{
+	.paper-material[elevation="1"]{
           height: 100%;
         }
       </style>
