@@ -163,6 +163,11 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
           color: #fff;
         }
 
+        .dateSticker.today {
+          border: solid 2px var(--my-elem-primary);
+          margin-top: -0.5px !important;
+        }
+
         /* .mainHeader bg color to primary color */
 
         .mainHeader {
@@ -482,6 +487,10 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     this.currentYear = this._getSelectedYear();
     this.currentMonth = this._getSelectedMonth();
 
+    this.todayYear = this._getCurrentDate().getFullYear();
+    this.todayMonth = this._getCurrentDate().getMonth();
+    this.todayDay = this._getCurrentDate().getDate();
+
     this.generateTable();
 
     //update header color if set
@@ -583,6 +592,9 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     }
     if (this._getSelectedDay() == s && this._getSelectedMonth() == this.currentMonth && this._getSelectedYear() == this.currentYear) {
       return 'dateSticker selected';
+    }
+    if (s == this.todayDay && this.currentMonth == this.todayMonth && this.currentYear == this.todayYear) {
+      return 'dateSticker today';
     }
     return 'dateSticker';
   }
