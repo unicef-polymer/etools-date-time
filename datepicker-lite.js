@@ -71,6 +71,14 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
         :host {
           display: block;
+          --paper-input-container: {
+            width: 180px;
+            max-width: 100%;
+          }
+          max-width: 100%;
+        }
+        paper-input-container {
+          max-width: 100%;
         }
 
         .paper-input-input input {
@@ -154,6 +162,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         calendar-lite {
             z-index: 130;
         }
+
       </style>
 
       <paper-input-container always-float-label
@@ -167,16 +176,20 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
         <div slot="input" class="paper-input-input">
 
-          <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number"
-                 min="1" max="31" on-blur="_handleOnBlur">/
-          <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm"
-                 type="number" min="1" max="12" on-blur="_handleOnBlur">/
-          <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy"
-                 type="number" min="1" max="9999" on-blur="_handleOnBlur">
-
+          <template is="dom-if" if="[[_selectedDateDisplayFormatIsDefault(selectedDateDisplayFormat)]]">
+            <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number"
+                  min="1" max="31" on-blur="_handleOnBlur">/
+            <input value="{{monthInput::input}}" readonly$="[[readonly]]" class="monthInput" placeholder="mm"
+                  type="number" min="1" max="12" on-blur="_handleOnBlur">/
+            <input value="{{yearInput::input}}" readonly$="[[readonly]]" class="yearInput" placeholder="yyyy"
+                  type="number" min="1" max="9999" on-blur="_handleOnBlur">
+          </template>
+          <template is="dom-if" if="[[!_selectedDateDisplayFormatIsDefault(selectedDateDisplayFormat)]]">
+              [[formatDateForDisplay(value, readonly)]]
+          </template>
         </div>
 
-        <template is="dom-if" if="[[!readonly]]">
+        <template is="dom-if" if="[[showXBtn(readonly, value)]]">
           <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear" tabindex="1"
                      hidden$="[[clearBtnInsideDr]]"></iron-icon>
         </template>
@@ -283,7 +296,12 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         value: 'Date exceeds max date'
       },
       requiredErrorMsg: {
-        type: String
+        type: String,
+        value: 'This field is required'
+      },
+      selectedDateDisplayFormat: {
+        type: String,
+        value: 'default' // Other options would be 'D MMM YYYY'
       }
 
     };
@@ -337,17 +355,9 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       return;
     }
     let date = event.detail.date;
-    let month = '' + (date.getMonth() + 1);
-    let day = '' + date.getDate();
-    let year = date.getFullYear();
 
-    month = month.length < 2 ? '0' + month : month;
-    day = day.length < 2 ? '0' + day : day;
+    this._setDayMonthYearInInputElements(date);
 
-    this._stopDateCompute = true;
-    this.set('monthInput', month);
-    this.set('dayInput', day);
-    this.set('yearInput', year);
     this.value = this._getDateString(date);
 
     this._triggerDateChangeCustomEvent(date);
@@ -356,6 +366,21 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       _closeDatepickers();
     }
     this._stopDateCompute = false;
+  }
+
+  _setDayMonthYearInInputElements(date) {
+    let month = '' + (date.getMonth() + 1);
+    let day = '' + date.getDate();
+    let year = date.getFullYear();
+
+    month = month.length < 2 ? '0' + month : month;
+    day = day.length < 2 ? '0' + day : day;
+
+    this._stopDateCompute = true;
+
+    this.set('monthInput', month);
+    this.set('dayInput', day);
+    this.set('yearInput', year);
   }
 
   computeDate(month, day, year) {
@@ -373,11 +398,16 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         return;
       }
 
-      if (this._isValidYear() && this._isValidMonth() &&
-          this._isValidDay() && this._enteredDateIsValid()) {
-        let newDate = new Date(year, month - 1, day);
-        this.set('inputDate', newDate);
-        this.set('value', year + '-' + month + '-' + day);
+      if (this.monthInput || this.dayInput || this.yearInput) {
+        if (this._isValidYear() && this._isValidMonth() &&
+            this._isValidDay() && this._enteredDateIsValid()) {
+          let newDate = new Date(year, month - 1, day);
+
+          this.set('inputDate', newDate);
+          this.set('value', year + '-' + month + '-' + day);
+        }
+      } else {
+        this.set('value', null);
       }
     }
   }
@@ -529,6 +559,21 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     if (this.autoValidate) {
       this.validate();
     }
+  }
+
+  formatDateForDisplay(selectedDt, readonly) {
+    if (!selectedDt) {
+      return readonly ? '-' : '';
+    }
+    return moment(selectedDt, 'YYYY-MM-DD').format(this.selectedDateDisplayFormat);
+  }
+
+  showXBtn(readonly, selectedDt) {
+    return !readonly && selectedDt;
+  }
+
+  _selectedDateDisplayFormatIsDefault() {
+    return this.selectedDateDisplayFormat === 'default';
   }
 
 }

@@ -164,7 +164,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
         }
 
         .dateSticker.today {
-          border: solid 2px var(--my-elem-primary);
+          border: solid 1px var(--my-elem-primary);
           margin-top: -0.5px !important;
         }
 
