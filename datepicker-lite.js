@@ -89,6 +89,8 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
         iron-icon {
           @apply --layout;
+        }
+        iron-icon:not[readonly] {
           cursor: pointer;
         }
 
@@ -100,10 +102,6 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           margin-left: 8px;
           width: 14px;
           height: 14px;
-        }
-
-        iron-icon[readonly] {
-          cursor: default;
         }
 
         .clear-btn,
@@ -162,19 +160,25 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         calendar-lite {
             z-index: 130;
         }
+        #dateDisplayinputContainer:not([readonly]) {
+          cursor: pointer;
+        }
 
       </style>
 
-      <paper-input-container always-float-label
+      <paper-input-container id="dateDisplayinputContainer"
+                             always-float-label
                              disabled$="[[disabled]]"
+                             readonly$="[[readonly]]"
                              required$="[[required]]"
-                             invalid="{{invalid}}">
+                             invalid="{{invalid}}"
+                             on-keypress="_toggelOnKeyPressFromPaperInput" on-tap="toggleCalendarFromPaperInput">
         <label hidden$=[[!label]] slot="label">[[label]]</label>
 
-        <iron-icon on-keypress="_toggelOnKeyPress" readonly$="[[readonly]]" icon="date-range" title="Toggle calendar" tabindex="1"
-                   on-tap="toggleCalendar" slot="prefix"></iron-icon>
+        <iron-icon on-keypress="_toggelOnKeyPressFromIcon" readonly$="[[readonly]]" icon="date-range" title="Toggle calendar" tabindex="1"
+                   on-tap="toggleCalendarFromIcon" slot="prefix"></iron-icon>
 
-        <div slot="input" class="paper-input-input" on-keypress="_toggelOnKeyPress" on-tap="toggleCalendar" readonly$="[[readonly]]">
+        <div slot="input" class="paper-input-input" readonly$="[[readonly]]">
 
           <template is="dom-if" if="[[_selectedDateDisplayFormatIsDefault(selectedDateDisplayFormat)]]">
             <input value="{{dayInput::input}}" readonly$="[[readonly]]" class="dayInput" placeholder="dd" type="number"
@@ -411,7 +415,19 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       }
     }
   }
+  toggleCalendarFromPaperInput() {
+    if (this._selectedDateDisplayFormatIsDefault(this.selectedDateDisplayFormat)) {
+      return;
+    }
 
+    this.toggleCalendar();
+  }
+
+  toggleCalendarFromIcon() {
+    if (this._selectedDateDisplayFormatIsDefault(this.selectedDateDisplayFormat)) {
+      this.toggleCalendar();
+    }
+  }
   toggleCalendar() {
     if (!this.readonly) {
       this.set('opened', !this.opened);
@@ -426,6 +442,18 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     }
   }
 
+  _toggelOnKeyPressFromPaperInput(event) {
+    if (this._selectedDateDisplayFormatIsDefault(this.selectedDateDisplayFormat)) {
+      return;
+    }
+
+    this._toggelOnKeyPress(event);
+  }
+  _toggelOnKeyPressFromIcon(event) {
+    if (this._selectedDateDisplayFormatIsDefault(this.selectedDateDisplayFormat)) {
+      this._toggelOnKeyPress(event);
+    }
+  }
   _toggelOnKeyPress(event) {
     if (!this.readonly) {
       if (event.which === 13 || event.button === 0) {
@@ -434,7 +462,12 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     }
   }
 
-  _clearData() {
+  _clearData(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+
     this._clearDateInProgress = true;
     this.set('inputDate', null);
     this.set('monthInput', undefined);
