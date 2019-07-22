@@ -490,7 +490,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
   }
 
   _isValidMonth() {
-    return this.monthInput >= 1 && this.monthInput <= 12;
+    return Number(this.monthInput) >= 1 && Number(this.monthInput) <= 12;
   }
 
   _isValidDay() {
