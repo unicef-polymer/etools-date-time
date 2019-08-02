@@ -1,5 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
-import {GestureEventListeners} from '@polymer/polymer/lib/mixins/gesture-event-listeners.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
+import { GestureEventListeners } from '@polymer/polymer/lib/mixins/gesture-event-listeners.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-iconset-svg/iron-iconset-svg.js';
@@ -503,14 +503,11 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     }
 
     //push into years list
-    var tmpArray = [];
     if (this.maxDate != null && this.minDate != null) {
       this._generateYears((this.minDate).getFullYear(), (this.maxDate).getFullYear());
     } else {
-      this._generateYears(this.currentYear - 101, this.currentYear + 30, tmpArray);
+      this._generateYears(this.currentYear - 101, this.currentYear + 30);
     }
-    //discard tmpArray
-    tmpArray = null;
   }
 
   _getSelectedYear() {
@@ -550,7 +547,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     else if (type == 'day') {
       return this.date ? this.days_names[this.date.getDay()] : '';
     } else if (type == 'date') {
-      return this.date ? this.date.getDate() :  null;
+      return this.date ? this.date.getDate() : null;
     } else {
       //some thing weird
     }
@@ -565,23 +562,23 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     this.cf = 0;
     //fill with empty cells
     for (var i = 0; i < this.tmpDate.getDay(); i++) {
-      tmpArray.push({text: '', isDisabled: false, i: this.cf++});
+      tmpArray.push({ text: '', isDisabled: false, i: this.cf++ });
     }
 
     //fill days and check disable dates
     for (var i = 1; i <= this.monthDays(this.tmpDate); i++) {
       this.tmpDate.setDate(i);
       if ((this.minDate != null && this.tmpDate <= this.minDate) || (this.maxDate != null && this.tmpDate >= this.maxDate) || this.disabledWeekDay.indexOf(this.days_names[(this.tmpDate).getDay()]) != -1 || (this.disabledDays).indexOf(i) != -1) {
-        tmpArray.push({text: i, isDisabled: true, i: this.cf++});
+        tmpArray.push({ text: i, isDisabled: true, i: this.cf++ });
       } else {
-        tmpArray.push({text: i, isDisabled: false, i: this.cf++});
+        tmpArray.push({ text: i, isDisabled: false, i: this.cf++ });
       }
 
     }
     //fill remaining empty cells
     this.cf = (tmpArray.length > 35) ? (42 - (tmpArray.length)) : (34 - (tmpArray.length));
     for (var j = 0; j <= this.cf; j++) {
-      tmpArray.push({text: ''});
+      tmpArray.push({ text: '' });
     }
     this.days = tmpArray;
     tmpArray = null;
@@ -658,7 +655,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
   }
 
   triggerEvent(e, data) {
-    var event = new CustomEvent(e, {detail: {dates: data}});
+    var event = new CustomEvent(e, { detail: { dates: data } });
     this.dispatchEvent(event);
   }
 
@@ -698,7 +695,8 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     pages = null;
   }
 
-  _generateYears(min, max, tmpArray) {
+  _generateYears(min, max) {
+    let tmpArray = [];
     for (var i = min; i <= max; i++) {
       tmpArray.push(i);
     }
@@ -712,7 +710,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     this.generateTable();
     this.separator = [0, 1, 2, 3, 4, 5];
 
-    this.dispatchEvent(new CustomEvent('date-change', {detail: {date: newDate}}));
+    this.dispatchEvent(new CustomEvent('date-change', { detail: { date: newDate } }));
   }
 
   dateFormat(date) {
@@ -742,7 +740,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     tmp.setMonth(this.currentMonth + (typeof x === 'number' ? x : 0));
     this.currentMonth = tmp.getMonth();
     this.currentYear = tmp.getFullYear();
-    this.dispatchEvent(new CustomEvent('month-change', {detail: {date: this.tmpDate}}));
+    this.dispatchEvent(new CustomEvent('month-change', { detail: { date: this.tmpDate } }));
     this.generateTable();
     this.separator = [0, 1, 2, 3, 4, 5];
   }

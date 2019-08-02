@@ -48,7 +48,7 @@ declare class CalendarLite {
   _setMonth(e: any): void;
   _show(e: any): void;
   pagination(): void;
-  _generateYears(min: any, max: any, tmpArray: any): void;
+  _generateYears(min: any, max: any): void;
   _populate(newDate: any, oldDate: any): void;
   dateFormat(date: any): any;
   monthFormat(): any;
