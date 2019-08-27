@@ -585,6 +585,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     const d = new Date(dData[0], Number(dData[1]) - 1, dData[2]);
     if (d.toString() !== 'Invalid Date') {
       this.set('inputDate', d);
+      this._triggerDateChangeCustomEvent(this.value);
     }
   }
 
