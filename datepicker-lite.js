@@ -193,7 +193,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           </template>
         </div>
 
-        <template is="dom-if" if="[[showXBtn(readonly, value)]]">
+        <template is="dom-if" if="[[showXBtn(readonly, disabled, value)]]">
           <iron-icon icon="clear" slot="suffix" on-tap="_clearData" title="Clear" tabindex="1"
                      hidden$="[[clearBtnInsideDr]]"></iron-icon>
         </template>
@@ -490,7 +490,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
   }
 
   _isValidMonth() {
-    return this.monthInput >= 1 && this.monthInput <= 12;
+    return Number(this.monthInput) >= 1 && Number(this.monthInput) <= 12;
   }
 
   _isValidDay() {
@@ -585,6 +585,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     const d = new Date(dData[0], Number(dData[1]) - 1, dData[2]);
     if (d.toString() !== 'Invalid Date') {
       this.set('inputDate', d);
+      this._triggerDateChangeCustomEvent(this.value);
     }
   }
 
@@ -601,8 +602,8 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     return moment(selectedDt, 'YYYY-MM-DD').format(this.selectedDateDisplayFormat);
   }
 
-  showXBtn(readonly, selectedDt) {
-    return !readonly && selectedDt;
+  showXBtn(readonly, disabled, selectedDt) {
+    return (!readonly && !disabled) && selectedDt;
   }
 
   _selectedDateDisplayFormatIsDefault() {

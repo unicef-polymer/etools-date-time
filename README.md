@@ -2,7 +2,7 @@
 Polymer 3 components
 
 ## Install
-`$ npm install git+https://github.com/unicef-polymer/etools-date-time.git`
+`$ npm i --save @unicef-polymer/etools-date-time`
 
 ## Description
 Polymer 3 components used for date and time fields.
