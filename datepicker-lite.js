@@ -569,7 +569,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
   maxDateValidation() {
     if (this.maxDate && this.value) {
-      let valid = moment(this.value, 'YYYY-MM-DD') <= this.maxDate;
+      let valid = moment(this.value, controlFormat) <= this.maxDate;
       if (!valid) {
         this.errorMessage = this.maxDateErrorMsg;
       }
@@ -580,7 +580,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
   minDateValidation() {
     if (this.minDate && this.value) {
-      let valid = moment(this.value, 'YYYY-MM-DD') >= this.minDate;
+      let valid = moment(this.value, controlFormat) >= this.minDate;
       if (!valid) {
         this.errorMessage = this.minDateErrorMsg;
       }
@@ -645,7 +645,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     if (!selectedDt) {
       return readonly ? '-' : '';
     }
-    return moment(selectedDt, 'YYYY-MM-DD').format(this.selectedDateDisplayFormat);
+    return moment(selectedDt, controlFormat).format(this.selectedDateDisplayFormat);
   }
 
   showXBtn(readonly, disabled, selectedDt) {
