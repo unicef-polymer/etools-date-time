@@ -342,10 +342,12 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         value: 'This field is required'
       },
       selectedDateDisplayFormat: {
+        // to display selected date in a different format than default 'YYYY-MM-DD'  Ex: other option would be 'D MMM YYYY'
         type: String,
-        value: 'default' // Other options would be 'D MMM YYYY'
+        value: 'default'
       },
       inputDateFormat: {
+        // datepicker works internally with date in format 'YYYY-MM-DD', in case input value has a different format, this can be specified using this property
         type: String,
         value: ''
       }

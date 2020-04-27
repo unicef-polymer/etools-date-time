@@ -132,6 +132,12 @@ Is a lite and simple date picker.
 <calendar-lite id="someid" max-date="[[getCurrentDate()]]" min-date="[[getMinDate()]]"> </calendar-lite>
 ```
 
+input-date-format: datepicker works internally with date in format 'YYYY-MM-DD', in case input value has a different
+format, this format can be specified using this property
+
+selected-date-display-format: used to display selected date in
+a different format than default 'YYYY-MM-DD' Ex: other option would be 'D MMM YYYY'
+
 ```html
 <datepicker-lite
   class="start-date"
