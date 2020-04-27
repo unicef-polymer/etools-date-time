@@ -18,30 +18,32 @@ import {GestureEventListeners} from '@polymer/polymer/lib/mixins/gesture-event-l
 
 declare class DatePickerLite extends
   GestureEventListeners(
-  PolymerElement) {
-  value: string|null|undefined;
-  readonly: boolean|null|undefined;
-  required: boolean|null|undefined;
-  errorMessage: string|null|undefined;
-  disabled: boolean|null|undefined;
-  label: string|null|undefined;
-  monthInput: number|null|undefined;
-  dayInput: number|null|undefined;
-  yearInput: number|null|undefined;
-  invalid: boolean|null|undefined;
-  inputDate: Date|null|undefined;
-  opened: boolean|null|undefined;
-  clearBtnInsideDr: boolean|null|undefined;
-  closeOnSelect: boolean|null|undefined;
-  _clearDateInProgress: boolean|null|undefined;
-  _stopDateCompute: boolean|null|undefined;
-  autoValidate: boolean|null|undefined;
-  minDate: Date|null|undefined;
-  maxDate: Date|null|undefined;
-  fireDateHasChanged: boolean|null|undefined;
-  minDateErrorMsg: string|null|undefined;
-  maxDateErrorMsg: string|null|undefined;
-  requiredErrorMsg: string|null|undefined;
+    PolymerElement) {
+  value: string | null | undefined;
+  readonly: boolean | null | undefined;
+  required: boolean | null | undefined;
+  errorMessage: string | null | undefined;
+  disabled: boolean | null | undefined;
+  label: string | null | undefined;
+  monthInput: number | null | undefined;
+  dayInput: number | null | undefined;
+  yearInput: number | null | undefined;
+  invalid: boolean | null | undefined;
+  inputDate: Date | null | undefined;
+  opened: boolean | null | undefined;
+  clearBtnInsideDr: boolean | null | undefined;
+  closeOnSelect: boolean | null | undefined;
+  _clearDateInProgress: boolean | null | undefined;
+  _stopDateCompute: boolean | null | undefined;
+  autoValidate: boolean | null | undefined;
+  minDate: Date | null | undefined;
+  maxDate: Date | null | undefined;
+  fireDateHasChanged: boolean | null | undefined;
+  minDateErrorMsg: string | null | undefined;
+  maxDateErrorMsg: string | null | undefined;
+  requiredErrorMsg: string | null | undefined;
+  selectedDateDisplayFormat: string | null | undefined;
+  inputDateFormat: string | null | undefined;
   connectedCallback(): void;
   _getDateString(date: any): any;
   datePicked(event: any): void;
