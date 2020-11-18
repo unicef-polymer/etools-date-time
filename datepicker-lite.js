@@ -645,7 +645,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
   formatDateForDisplay(selectedDt, readonly) {
     if (!selectedDt) {
-      return readonly ? '-' : '';
+      return readonly ? '—' : '';
     }
     return moment(selectedDt, controlFormat).format(this.selectedDateDisplayFormat);
   }
