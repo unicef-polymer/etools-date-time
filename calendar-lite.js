@@ -6,8 +6,8 @@ import '@polymer/iron-iconset-svg/iron-iconset-svg.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-styles/element-styles/paper-material-styles.js';
 
-const dayjs = window.dayjs || window.moment;
-if (!dayjs) {
+const dateLib = window.dayjs || window.moment;
+if (!dateLib) {
   throw new Error('CalendarLite: dayjs or moment is not loaded');
 }
 
@@ -634,18 +634,18 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       }
 
       this.date = new Date(this.currentYear, this.currentMonth, f.text);
-      this.prettyDate = dayjs(this.date).format(this.format);
+      this.prettyDate = dateLib(this.date).format(this.format);
     }
   }
 
   prettyDateChanged(newPrettyDate) {
-    if (this.date && dayjs(this.date).format(this.format) === newPrettyDate) {
+    if (this.date && dateLib(this.date).format(this.format) === newPrettyDate) {
       return;
     }
     if (!newPrettyDate) {
       return;
     }
-    this.date = dayjs(newPrettyDate, this.format).toDate();
+    this.date = dateLib(newPrettyDate, this.format).toDate();
   }
 
   _keyPressSelect(e) {
