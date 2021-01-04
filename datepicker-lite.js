@@ -7,9 +7,9 @@ import '@polymer/paper-button/paper-button.js';
 
 import './calendar-lite.js';
 
-const moment = window.moment;
-if (!moment) {
-  throw new Error('DatepickerLite: momentjs is not loaded');
+const dateLib = window.dayjs || window.moment;
+if (!dateLib) {
+  throw new Error('DatepickerLite: dayjs or moment is not loaded');
 }
 
 var openedDatepickerLiteElems = window.openedDatepickerLiteElems || [];
@@ -571,7 +571,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
   maxDateValidation() {
     if (this.maxDate && this.value) {
-      let valid = moment(this.value, controlFormat) <= this.maxDate;
+      let valid = dateLib(this.value, controlFormat) <= this.maxDate;
       if (!valid) {
         this.errorMessage = this.maxDateErrorMsg;
       }
@@ -582,7 +582,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
 
   minDateValidation() {
     if (this.minDate && this.value) {
-      let valid = moment(this.value, controlFormat) >= this.minDate;
+      let valid = dateLib(this.value, controlFormat) >= this.minDate;
       if (!valid) {
         this.errorMessage = this.minDateErrorMsg;
       }
@@ -614,7 +614,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       return;
     }
     if (this.inputDateFormat) {
-      const formattedDate = moment(newValue, this.inputDateFormat, true);
+      const formattedDate = dateLib(newValue, this.inputDateFormat, true);
       if (formattedDate.isValid()) {
         newValue = formattedDate.format(controlFormat);
       }
@@ -647,7 +647,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     if (!selectedDt) {
       return readonly ? '—' : '';
     }
-    return moment(selectedDt, controlFormat).format(this.selectedDateDisplayFormat);
+    return dateLib(selectedDt, controlFormat).format(this.selectedDateDisplayFormat);
   }
 
   showXBtn(readonly, disabled, selectedDt) {
