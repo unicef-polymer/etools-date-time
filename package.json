@@ -1,7 +1,7 @@
 {
   "name": "@unicef-polymer/etools-date-time",
   "description": "Date and time components - built with Polymer 3",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "homepage": "https://github.com/unicef-polymer/etools-date-time",
   "repository": {
     "type": "git",
@@ -25,8 +25,7 @@
     "@polymer/paper-styles": "^3.0.1",
     "@polymer/polymer": "^3.2.0",
     "@webcomponents/webcomponentsjs": "^2.2.10",
-    "web-animations-js": "^2.3.1",
-    "moment": "^2.24.0"
+    "web-animations-js": "^2.3.1"
   },
   "devDependencies": {
     "@polymer/gen-typescript-declarations": "^1.6.1",
