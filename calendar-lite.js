@@ -302,7 +302,8 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       <div class="paper-material card" elevation="1">
         <div class="mainHeader" style="" hidden$="[[hideHeader]]">
           <div class="yearContainer notextselect" type='yearList' on-tap="_show">
-            {{_getHeaderYear(currentYear, currentDay)}}
+<!--            {{_getHeaderYear(currentYear, currentDay)}}-->
+            {{currentYear}}
           </div>
           <div class="monthContainer notextselect">
             <span type='calendarContent' on-tap="_show" class="menu_item">{{_getUpdated(date,'day')}}</span><span hidden$="[[!_showComma(currentDay, currentMonth)]]">,</span>
@@ -332,7 +333,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
             <div id="yearList" class="page" style="display:none;">
               <div class="flex-wrap">
                 <template is="dom-repeat" items="{{years}}">
-                  <div class="dateItem notextselect" on-tap="_setYear">{{item}}</div>
+                  <div class="dateItem notextselect yearItem" on-tap="_setYear">{{item}}</div>
                 </template>
               </div>
             </div>
@@ -534,9 +535,9 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     return this._getUpdated(this.date, 'month');
   }
 
-  _getHeaderYear(currentYear, _currentDay) {
-    return this._getUpdated(this.date, 'year');
-  }
+  // _getHeaderYear(currentYear, _currentDay) {
+  //   return this._getUpdated(this.date, 'year');
+  // }
 
   _getUpdated(d, type) {
     if (type == 'year') {
@@ -677,6 +678,14 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
 
   _show(e) {
     this.current_page = e.target.attributes.type.value;
+    setTimeout(() =>{
+      let list = this.shadowRoot.querySelectorAll('.yearItem');
+      Array.prototype.forEach.call(list, (el) => {
+        let found = Array.prototype.find.call(list, el => Number(el.innerText) === this._getSelectedYear());
+        found.scrollIntoView({block: "center"});
+      });
+    }, 50)
+
     this.pagination();
   }
 

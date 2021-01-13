@@ -9,6 +9,7 @@
   },
   "license": "see license in LICENSE",
   "scripts": {
+    "start": "polymer serve",
     "lint": "npm run lint:javascript && polymer lint && exit 0",
     "lint:javascript": "eslint . --ext js,html && exit 0",
     "gen-typings": "gen-typescript-declarations --deleteExisting --outDir './'",
