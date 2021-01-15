@@ -292,7 +292,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
           font-weight: bold;
         }
 
-	.paper-material[elevation="1"]{
+	    .paper-material[elevation="1"]{
           height: 100%;
         }
       </style>
@@ -302,8 +302,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       <div class="paper-material card" elevation="1">
         <div class="mainHeader" style="" hidden$="[[hideHeader]]">
           <div class="yearContainer notextselect" type='yearList' on-tap="_show">
-<!--            {{_getHeaderYear(currentYear, currentDay)}}-->
-            {{currentYear}}
+            {{_getHeaderYear(currentYear, currentDay)}}
           </div>
           <div class="monthContainer notextselect">
             <span type='calendarContent' on-tap="_show" class="menu_item">{{_getUpdated(date,'day')}}</span><span hidden$="[[!_showComma(currentDay, currentMonth)]]">,</span>
@@ -535,9 +534,9 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     return this._getUpdated(this.date, 'month');
   }
 
-  // _getHeaderYear(currentYear, _currentDay) {
-  //   return this._getUpdated(this.date, 'year');
-  // }
+  _getHeaderYear(currentYear, _currentDay) {
+    return this._getUpdated(this.date, 'year');
+  }
 
   _getUpdated(d, type) {
     if (type == 'year') {
