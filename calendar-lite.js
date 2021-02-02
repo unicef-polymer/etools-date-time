@@ -679,7 +679,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     this.current_page = e.target.attributes.type.value;
     setTimeout(() =>{
       let list = this.shadowRoot.querySelectorAll('.yearItem');
-      let selectedYearElem = Array.prototype.find.call(list, el => Number(el.innerText) === this._getSelectedYear());
+      let selectedYearElem = Array.from(list).find(el => Number(el.innerText) === this._getSelectedYear());
       selectedYearElem.scrollIntoView({block: "center"});
     }, 50)
 
