@@ -368,11 +368,20 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
                   <template is="dom-repeat" items="{{separator}}" as="row">
                     <div class="dates">
                       <template is="dom-repeat" items="{{_getDays(row,separator)}}" as="day">
-                        <div on-tap="_setDate"
-                             on-keydown="_keyPressSelect"
-                             class$="{{_getDayClass(day.text, currentDay, currentMonth, currentYear)}}"
-                             disabled$="{{day.isDisabled}}" tabindex="1">{{day.text}}
-                        </div>
+                        <template is="dom-if" if="{{day.text}}" restamp>
+                          <div on-tap="_setDate"
+                              on-keydown="_keyPressSelect"
+                              class$="{{_getDayClass(day.text, currentDay, currentMonth, currentYear)}}"
+                              disabled$="{{day.isDisabled}}" tabindex="0">{{day.text}}
+                          </div>
+                        </template>
+                        <template is="dom-if" if="{{!day.text}}" restamp>
+                          <div on-tap="_setDate"
+                              on-keydown="_keyPressSelect"
+                              class$="{{_getDayClass(day.text, currentDay, currentMonth, currentYear)}}"
+                              disabled$="{{day.isDisabled}}" tabindex="-1">{{day.text}}
+                          </div>
+                        </template>
                       </template>
                     </div>
                   </template>
