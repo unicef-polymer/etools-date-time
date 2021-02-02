@@ -292,7 +292,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
           font-weight: bold;
         }
 
-	.paper-material[elevation="1"]{
+	    .paper-material[elevation="1"]{
           height: 100%;
         }
       </style>
@@ -332,7 +332,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
             <div id="yearList" class="page" style="display:none;">
               <div class="flex-wrap">
                 <template is="dom-repeat" items="{{years}}">
-                  <div class="dateItem notextselect" on-tap="_setYear">{{item}}</div>
+                  <div class="dateItem notextselect yearItem" on-tap="_setYear">{{item}}</div>
                 </template>
               </div>
             </div>
@@ -686,6 +686,12 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
 
   _show(e) {
     this.current_page = e.target.attributes.type.value;
+    setTimeout(() =>{
+      let list = this.shadowRoot.querySelectorAll('.yearItem');
+      let selectedYearElem = Array.from(list).find(el => Number(el.innerText) === this._getSelectedYear());
+      selectedYearElem.scrollIntoView({block: "center"});
+    }, 50)
+
     this.pagination();
   }
 
