@@ -173,15 +173,28 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       >
         <label hidden$="[[!label]]" slot="label">[[label]]</label>
 
-        <iron-icon
-          on-keypress="_toggelOnKeyPressFromIcon"
-          readonly$="[[readonly]]"
-          icon="date-range"
-          title="Toggle calendar"
-          tabindex="1"
-          on-tap="toggleCalendarFromIcon"
-          slot="prefix"
-        ></iron-icon>
+        <template is="dom-if" if="[[readonly]]">
+          <iron-icon
+            on-keypress="_toggelOnKeyPressFromIcon"
+            readonly$="[[readonly]]"
+            icon="date-range"
+            title="Toggle calendar"
+            tabindex="-1"
+            on-tap="toggleCalendarFromIcon"
+            slot="prefix"
+          ></iron-icon>
+        </template>
+        <template is="dom-if" if="[[!readonly]]">
+          <iron-icon
+            on-keypress="_toggelOnKeyPressFromIcon"
+            readonly$="[[readonly]]"
+            icon="date-range"
+            title="Toggle calendar"
+            tabindex="0"
+            on-tap="toggleCalendarFromIcon"
+            slot="prefix"
+          ></iron-icon>
+        </template>
 
         <div slot="input" class="paper-input-input" readonly$="[[readonly]]">
           <template is="dom-if" if="[[_selectedDateDisplayFormatIsDefault(selectedDateDisplayFormat)]]">
