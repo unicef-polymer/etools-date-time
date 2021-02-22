@@ -301,10 +301,10 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
 
       <div class="paper-material card" elevation="1">
         <div class="mainHeader" style="" hidden$="[[hideHeader]]">
-          <div class="yearContainer notextselect" type='yearList' on-tap="_show">
+          <div tabindex="0" id="headerYear" class="yearContainer notextselect" type='yearList' on-tap="_show">
             {{_getHeaderYear(currentYear, currentDay)}}
           </div>
-          <div class="monthContainer notextselect">
+          <div class="monthContainer notextselect" tabindex="0">
             <span type='calendarContent' on-tap="_show" class="menu_item">{{_getUpdated(date,'day')}}</span><span hidden$="[[!_showComma(currentDay, currentMonth)]]">,</span>
              <span class='menu_item' type='monthsList' on-tap="_show">{{_getHeaderMonth(currentMonth, currentDay)}}</span>
              <span class='menu_item' type='calendarContent' on-tap="_show">{{_getUpdated(date,'date')}}</span>
@@ -480,6 +480,10 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     this.tmpDate = null;
     this.cf = null;
     this.tmpObject = null;
+  }
+
+  focusOnHeaderYear() {
+    this.shadowRoot.querySelector('#headerYear').focus();
   }
 
   //to get number of days in a month
