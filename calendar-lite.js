@@ -301,6 +301,12 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
       .headerMonth:focus {
         outline: 1px solid white;
       }
+      #day:focus:not(:focus-visible) {
+        outline: 0;
+      }
+      #day:focus-visible {
+        outline: 1px solid black;
+      }
       </style>
 
       <!-- Main header date,month,year are compund binded to selected date -->
@@ -376,6 +382,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
                       <template is="dom-repeat" items="{{_getDays(row,separator)}}" as="day">
                         <template is="dom-if" if="{{day.text}}" restamp>
                           <div on-tap="_setDate"
+                              id="day"
                               on-keydown="_keyPressSelect"
                               class$="{{_getDayClass(day.text, currentDay, currentMonth, currentYear)}}"
                               disabled$="{{day.isDisabled}}" tabindex="0">{{day.text}}
