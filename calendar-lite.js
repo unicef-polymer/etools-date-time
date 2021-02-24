@@ -295,19 +295,25 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
 	    .paper-material[elevation="1"]{
           height: 100%;
         }
+        #headerYear:focus {
+        outline: 1px solid white;
+      }
+      .headerMonth:focus {
+        outline: 1px solid white;
+      }
       </style>
 
       <!-- Main header date,month,year are compund binded to selected date -->
 
       <div class="paper-material card" elevation="1">
         <div class="mainHeader" style="" hidden$="[[hideHeader]]">
-          <div tabindex="0" id="headerYear" class="yearContainer notextselect" type='yearList' on-tap="_show">
+          <div tabindex="0" id="headerYear" class="yearContainer notextselect" type='yearList' on-keydown="activateOnEnterAndSpace" on-tap="_show">
             {{_getHeaderYear(currentYear, currentDay)}}
           </div>
-          <div class="monthContainer notextselect" tabindex="0">
-            <span type='calendarContent' on-tap="_show" class="menu_item">{{_getUpdated(date,'day')}}</span><span hidden$="[[!_showComma(currentDay, currentMonth)]]">,</span>
-             <span class='menu_item' type='monthsList' on-tap="_show">{{_getHeaderMonth(currentMonth, currentDay)}}</span>
-             <span class='menu_item' type='calendarContent' on-tap="_show">{{_getUpdated(date,'date')}}</span>
+          <div id="headerMonth" class="monthContainer notextselect">
+            <span tabindex="0" type='calendarContent' on-tap="_show" on-keydown="activateOnEnterAndSpace" class="headerMonth menu_item">{{_getUpdated(date,'day')}}</span><span hidden$="[[!_showComma(currentDay, currentMonth)]]">,</span>
+             <span tabindex="0" class='headerMonth menu_item' type='monthsList' on-keydown="activateOnEnterAndSpace" on-tap="_show">{{_getHeaderMonth(currentMonth, currentDay)}}</span>
+             <span tabindex="0" class='headerMonth menu_item' type='calendarContent' on-keydown="activateOnEnterAndSpace" on-tap="_show">{{_getUpdated(date,'date')}}</span>
           </div>
         </div>
 
@@ -480,6 +486,16 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
     this.tmpDate = null;
     this.cf = null;
     this.tmpObject = null;
+  }
+
+  activateOnEnterAndSpace(event) {
+    if ((event.key === ' ' && !event.ctrlKey) || event.key === 'Enter') {
+      // Cancel the default action, if needed
+      event.preventDefault();
+      // Trigger the button element with a click
+      event.target.click();
+      return false;
+    }
   }
 
   focusOnHeaderYear() {
