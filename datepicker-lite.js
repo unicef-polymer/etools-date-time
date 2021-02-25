@@ -229,6 +229,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
             title="Clear"
             tabindex="1"
             hidden$="[[clearBtnInsideDr]]"
+            on-keydown="activateOnEnterAndSpace"
           ></iron-icon>
         </template>
 
@@ -244,6 +245,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         min-date="[[minDate]]"
         max-date="[[maxDate]]"
         hidden$="[[!opened]]"
+        on-keydown="closeCalendarOnEsc"
       >
         <div class="actions" slot="actions">
           <template is="dom-if" if="[[!readonly]]">
@@ -371,6 +373,24 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
         }
       }
     });
+
+  }
+
+  activateOnEnterAndSpace(event) {
+    if ((event.key === ' ' && !event.ctrlKey) || event.key === 'Enter') {
+      // Cancel the default action, if needed
+      event.preventDefault();
+      // Trigger the button element with a click
+      event.target.click();
+      return false;
+    }
+  }
+
+  closeCalendarOnEsc(event) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.target.parentNode.host.set('opened', false);
+    }
   }
 
   _getDateString(date) {
