@@ -178,7 +178,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           readonly$="[[readonly]]"
           icon="date-range"
           title="Toggle calendar"
-          tabindex="1"
+          tabindex="[[_getTabindexByReadonly(readonly)]]"
           on-tap="toggleCalendarFromIcon"
           slot="prefix"
         ></iron-icon>
@@ -382,6 +382,10 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     day = day.length < 2 ? '0' + day : day;
 
     return [year, month, day].join('-');
+  }
+
+  _getTabindexByReadonly(readOnly) {
+    return readOnly ? '-1' : '0';
   }
 
   _triggerDateChangeCustomEvent(date) {
