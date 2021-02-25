@@ -4,6 +4,7 @@ import {GestureEventListeners} from '@polymer/polymer/lib/mixins/gesture-event-l
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-button/paper-button.js';
+import '@a11y/focus-trap';
 
 import './calendar-lite.js';
 
@@ -237,28 +238,29 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
         </template>
       </paper-input-container>
+      <focus-trap>
+        <calendar-lite
+          id="calendar"
+          on-date-change="datePicked"
+          date="[[inputDate]]"
+          min-date="[[minDate]]"
+          max-date="[[maxDate]]"
+          hidden$="[[!opened]]"
+          on-keydown="closeCalendarOnEsc"
+        >
+          <div class="actions" slot="actions">
+            <template is="dom-if" if="[[!readonly]]">
+              <paper-button raised class="clear-btn" on-tap="_clearData" hidden$="[[!clearBtnInsideDr]]"
+                >Clear
+              </paper-button>
+            </template>
 
-      <calendar-lite
-        id="calendar"
-        on-date-change="datePicked"
-        date="[[inputDate]]"
-        min-date="[[minDate]]"
-        max-date="[[maxDate]]"
-        hidden$="[[!opened]]"
-        on-keydown="closeCalendarOnEsc"
-      >
-        <div class="actions" slot="actions">
-          <template is="dom-if" if="[[!readonly]]">
-            <paper-button raised class="clear-btn" on-tap="_clearData" hidden$="[[!clearBtnInsideDr]]"
-              >Clear
-            </paper-button>
-          </template>
-
-          <template is="dom-if" if="[[!closeOnSelect]]">
-            <paper-button raised class="close-btn" on-tap="toggleCalendar">Close</paper-button>
-          </template>
-        </div>
-      </calendar-lite>
+            <template is="dom-if" if="[[!closeOnSelect]]">
+              <paper-button raised class="close-btn" on-tap="toggleCalendar">Close</paper-button>
+            </template>
+          </div>
+        </calendar-lite>
+      </focus-trap>
     `;
   }
 
