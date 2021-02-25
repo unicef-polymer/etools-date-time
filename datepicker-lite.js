@@ -179,7 +179,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
           readonly$="[[readonly]]"
           icon="date-range"
           title="Toggle calendar"
-          tabindex="[[_getTabindexByReadonly(readonly)]]"
+          tabindex$="[[_getTabindexByReadonly(readonly)]]"
           on-tap="toggleCalendarFromIcon"
           slot="prefix"
         ></iron-icon>
@@ -228,7 +228,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
             slot="suffix"
             on-tap="_clearData"
             title="Clear"
-            tabindex="1"
+            tabindex="0"
             hidden$="[[clearBtnInsideDr]]"
             on-keydown="activateOnEnterAndSpace"
           ></iron-icon>
