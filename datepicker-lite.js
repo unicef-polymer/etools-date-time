@@ -173,28 +173,15 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
       >
         <label hidden$="[[!label]]" slot="label">[[label]]</label>
 
-        <template is="dom-if" if="[[readonly]]">
-          <iron-icon
-            on-keypress="_toggelOnKeyPressFromIcon"
-            readonly$="[[readonly]]"
-            icon="date-range"
-            title="Toggle calendar"
-            tabindex="-1"
-            on-tap="toggleCalendarFromIcon"
-            slot="prefix"
-          ></iron-icon>
-        </template>
-        <template is="dom-if" if="[[!readonly]]">
-          <iron-icon
-            on-keypress="_toggelOnKeyPressFromIcon"
-            readonly$="[[readonly]]"
-            icon="date-range"
-            title="Toggle calendar"
-            tabindex="0"
-            on-tap="toggleCalendarFromIcon"
-            slot="prefix"
-          ></iron-icon>
-        </template>
+        <iron-icon
+          on-keypress="_toggelOnKeyPressFromIcon"
+          readonly$="[[readonly]]"
+          icon="date-range"
+          title="Toggle calendar"
+          tabindex="[[_getTabindexByReadonly(readonly)]]"
+          on-tap="toggleCalendarFromIcon"
+          slot="prefix"
+        ></iron-icon>
 
         <div slot="input" class="paper-input-input" readonly$="[[readonly]]">
           <template is="dom-if" if="[[_selectedDateDisplayFormatIsDefault(selectedDateDisplayFormat)]]">
@@ -395,6 +382,10 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
     day = day.length < 2 ? '0' + day : day;
 
     return [year, month, day].join('-');
+  }
+
+  _getTabindexByReadonly(readOnly) {
+    return readOnly ? '-1' : '0';
   }
 
   _triggerDateChangeCustomEvent(date) {
