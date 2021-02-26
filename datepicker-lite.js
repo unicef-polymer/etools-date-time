@@ -391,7 +391,7 @@ class DatePickerLite extends GestureEventListeners(PolymerElement) {
   closeCalendarOnEsc(event) {
     if (event.key === 'Escape') {
       event.preventDefault();
-      event.target.parentNode.host.set('opened', false);
+      event.target.closest('focus-trap').parentNode.host.set('opened', false);
     }
   }
 
