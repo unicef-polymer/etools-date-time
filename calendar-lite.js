@@ -344,7 +344,7 @@ class CalendarLite extends GestureEventListeners(PolymerElement) {
             <div id="yearList" class="page" style="display:none;">
               <div class="flex-wrap">
                 <template is="dom-repeat" items="{{years}}">
-                  <div class="dateItem notextselect yearItem" on-tap="_setYear">{{item}}</div>
+                  <div class="dateItem notextselect yearItem" tabindex="0" on-tap="_setYear">{{item}}</div>
                 </template>
               </div>
             </div>
